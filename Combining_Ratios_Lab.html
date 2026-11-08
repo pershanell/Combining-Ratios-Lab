@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Combining Ratios Lab — From Electron Shells to Balanced Equations</title>
+<style>
+:root{--navy:#16324A;--teal:#2E8F8A;--gold:#D9A441;--bg:#f3f5f7;--card:#fff;--ok:#2e8b57;--bad:#c0392b;--warn:#d9822b;--line:#d5dde4}
+*{box-sizing:border-box}
+body{margin:0;font-family:Calibri,Carlito,'Segoe UI',Arial,sans-serif;font-size:17px;color:#1d2a35;background:var(--bg)}
+header{background:var(--navy);color:#fff;padding:14px 22px}
+header h1{margin:0;font-size:26px}
+header p{margin:4px 0 0;opacity:.85;font-size:16px}
+nav{display:flex;flex-wrap:wrap;gap:4px;background:#0f2536;padding:6px 10px 0}
+nav button{background:#2a4a63;color:#dfe8ef;border:0;padding:10px 14px;font:inherit;font-size:16px;border-radius:8px 8px 0 0;cursor:pointer}
+nav button.on{background:var(--bg);color:var(--navy);font-weight:bold}
+nav .num{display:inline-block;background:var(--gold);color:var(--navy);border-radius:50%;width:22px;height:22px;text-align:center;line-height:22px;font-weight:bold;margin-right:6px;font-size:14px}
+main{padding:16px 20px;max-width:1260px;margin:0 auto}
+.tab{display:none}.tab.on{display:block}
+.idea{background:#e6f2f1;border-left:6px solid var(--teal);padding:10px 14px;border-radius:6px;margin-bottom:14px}
+.idea b{color:var(--navy)}
+.row{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.card{background:var(--card);border-radius:10px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.08);border:1px solid var(--line)}
+.grow{flex:1 1 380px}
+h2{color:var(--navy);margin:0 0 8px;font-size:21px}
+h3{color:var(--teal);margin:12px 0 6px;font-size:18px}
+.btn{background:var(--teal);color:#fff;border:0;border-radius:6px;padding:8px 14px;font:inherit;font-size:16px;cursor:pointer;margin:3px}
+.btn:hover{filter:brightness(1.08)}
+.btn.alt{background:var(--navy)}.btn.gold{background:var(--gold);color:var(--navy)}
+.btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--navy)}
+.btn.sel{outline:3px solid var(--gold)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+select,input{font:inherit;font-size:16px;padding:5px 8px;border:1px solid #9fb0bf;border-radius:5px}
+label{font-size:16px}
+.msg{padding:10px 12px;border-radius:6px;margin-top:10px;min-height:22px;line-height:1.4}
+.msg:empty{display:none}
+.msg.ok{background:#e3f4ea;border:1px solid #9fd3b3;color:#1d5e3a}
+.msg.bad{background:#fbe7e5;border:1px solid #eeb2ab;color:#8a2a1f}
+.msg.warn{background:#fff3e0;border:1px solid #f0c894;color:#7a4a10}
+.msg.info{background:#eef3f8;border:1px solid #c8d6e3}
+.big{font-size:30px;font-weight:bold;color:var(--navy)}
+.muted{color:#5a6b78;font-size:15px}
+table.t{border-collapse:collapse;width:100%;font-size:16px}
+table.t th,table.t td{border:1px solid var(--line);padding:6px 8px;text-align:center}
+table.t th{background:var(--navy);color:#fff;font-weight:normal}
+.ptable{display:grid;grid-template-columns:62px repeat(8,1fr);gap:3px;max-width:560px}
+.ptable>div{min-height:48px;display:flex;align-items:center;justify-content:center;border-radius:5px;font-weight:bold;font-size:17px}
+.ptable .hd{color:var(--navy);font-size:14px;font-weight:bold}
+.ptable .cell{background:#e7edf2;border:1px solid #c5d1db;flex-direction:column;line-height:1.05}
+.ptable .cell small{font-weight:normal;font-size:12px;color:#556}
+.ptable .cell.click{cursor:pointer}.ptable .cell.click:hover{background:#d4e7e5}
+.ptable .cell.hl{background:var(--gold);border-color:#a87a20}
+.ptable .cell.okc{background:#9fd8b5;border-color:var(--ok)}
+.ptable .cell.badc{background:#f1aaa2;border-color:var(--bad)}
+.ptable .void{background:none}
+.opts{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+.opt{background:#fff;border:2px solid #b9c7d3;border-radius:8px;padding:10px 16px;cursor:pointer;font:inherit;font-size:20px;color:var(--navy)}
+.opt:hover{border-color:var(--teal)}
+.opt.okc{border-color:var(--ok);background:#e3f4ea}.opt.badc{border-color:var(--bad);background:#fbe7e5}
+.opt svg{display:block}
+.elgrid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}
+.elgrid button{padding:6px 0;font:inherit;font-size:16px;font-weight:bold;border:1px solid #b9c7d3;background:#fff;border-radius:5px;cursor:pointer;color:var(--navy)}
+.elgrid button.cur{background:var(--gold)}
+.elgrid button.done{background:#cde9e6}
+.elgrid button.cur.done{background:var(--gold)}
+.ionbox{display:flex;gap:30px;justify-content:center;min-height:170px;align-items:center;flex-wrap:wrap;padding:10px;background:#f7f9fb;border-radius:8px;border:1px dashed #b9c7d3}
+.ioncol{display:flex;flex-wrap:wrap;gap:8px;max-width:330px;justify-content:center}
+.ion{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:20px;border:3px solid}
+.ion.p{background:#fbecc9;border-color:var(--gold);color:#5b4210}
+.ion.n{background:#cfe9e6;border-color:var(--teal);color:#0f4a46}
+.units{display:flex;flex-wrap:wrap;gap:3px;align-items:center;min-height:26px}
+.u{width:22px;height:22px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:15px}
+.u.p{background:var(--gold);color:var(--navy)}.u.n{background:var(--teal);color:#fff}
+.eq{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px;font-size:26px;color:var(--navy);margin:8px 0}
+.sp{display:flex;flex-direction:column;align-items:center;gap:4px}
+.step{display:flex;align-items:center;gap:4px}
+.step button{width:32px;height:32px;border-radius:50%;border:0;background:var(--navy);color:#fff;font-size:20px;cursor:pointer;line-height:1}
+.step button:disabled{opacity:.3;cursor:not-allowed}
+.coef{min-width:32px;text-align:center;font-weight:bold;font-size:28px;color:var(--teal)}
+.op{padding-bottom:4px}
+.state{font-size:.6em;font-style:italic;vertical-align:sub;color:#5a6b78;font-weight:normal;margin-left:1px}
+.parts{display:flex;gap:12px;flex-wrap:wrap}
+.pbox{flex:1 1 300px;background:#f7f9fb;border:1px dashed #b9c7d3;border-radius:8px;padding:8px;min-height:120px}
+.pbox h4{margin:0 0 6px;color:var(--navy);font-size:16px}
+.mols{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.qin{width:52px;text-align:center;font-size:24px;font-weight:bold;color:var(--teal);padding:2px}
+.steps{margin:8px 0 0 0;padding-left:22px;line-height:1.55}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{padding:4px 10px;border-radius:14px;font-size:15px;border:1px solid}
+.chip.ok{background:#e3f4ea;border-color:#9fd3b3;color:#1d5e3a}
+.chip.bad{background:#fbe7e5;border-color:#eeb2ab;color:#8a2a1f}
+.score{float:right;background:var(--navy);color:#fff;border-radius:16px;padding:4px 12px;font-size:16px}
+.legend{font-size:15px;color:#3b4b58;line-height:1.5}
+.sub{font-size:.7em}
+
+.ratio{display:flex;flex-direction:column;align-items:center;background:var(--navy);color:#fff;border-radius:14px;padding:12px 20px;margin:12px 0;border:5px solid var(--gold);text-align:center}
+.ratio .rl{font-size:18px;letter-spacing:.5px;text-transform:uppercase;color:#cfe0ec}
+.ratio .rv{font-size:56px;font-weight:bold;color:var(--gold);line-height:1.15}
+.ratio .rv .who{color:#fff;font-size:34px}
+.ratio .rs{font-size:19px}
+.pkg{display:inline-flex;flex-wrap:wrap;gap:1px;justify-content:center;align-items:center;background:#fff;border:2px solid #9fb0bf;border-radius:10px;padding:4px 6px;font-size:22px;line-height:1.1;max-width:120px}
+.pname{font-size:15px;color:var(--navy);text-align:center;max-width:140px;line-height:1.2}
+.mode{display:inline-flex;border:2px solid var(--navy);border-radius:24px;overflow:hidden;margin-right:12px}
+.mode button{border:0;background:#fff;color:var(--navy);font:inherit;font-size:17px;padding:8px 18px;cursor:pointer}
+.mode button.on{background:var(--navy);color:#fff;font-weight:bold}
+.xstep{border:1px solid var(--line);border-left:6px solid var(--teal);border-radius:8px;padding:10px 14px;margin:10px 0;background:#fff}
+.xstep.done{border-left-color:var(--ok);background:#f6fbf8}
+.xstep h4{margin:0 0 4px;color:var(--navy);font-size:18px}
+.xstep .skill{font-size:14px;color:#fff;background:var(--teal);border-radius:10px;padding:2px 8px;margin-left:6px;font-weight:normal}
+.xin{width:120px;font-size:20px;font-weight:bold;color:var(--teal);text-align:center}
+.data{background:#fbf6ea;border:1px solid #ecd9a8;border-radius:8px;padding:8px 12px;font-size:16px}
+footer{text-align:center;color:#6b7b88;font-size:14px;padding:16px}
+.formula sub{font-size:.68em}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<header>
+  <h1>Combining Ratios Lab</h1>
+  <p>Why do elements combine in particular ratios? From electron shells → valency → formulae → balanced equations</p>
+</header>
+<nav id="nav"></nav>
+<main>
+
+<!-- TAB 1 -->
+<section class="tab" id="t1">
+  <div class="idea"><b>Start here.</b> An atom has the same number of electrons as protons. Electrons fill the shell closest to the nucleus first. Shell capacities (elements 1–20): <b>2, 8, 8</b> (and 2 more in shell 4 for K and Ca).</div>
+  <div class="row">
+    <div class="card" style="flex:0 0 auto">
+      <h2 id="b_title">Build an atom</h2>
+      <div style="margin-bottom:6px">
+        <label>Element: <select id="b_sel"></select></label>
+        <label style="margin-left:10px"><input type="checkbox" id="b_myst"> Mystery mode (hide the name)</label>
+      </div>
+      <div id="b_svg"></div>
+      <div class="muted">Click a shell to add an electron. Click an electron to take it away.</div>
+    </div>
+    <div class="card grow">
+      <h2>Your atom</h2>
+      <table class="t" style="max-width:420px">
+        <tr><th>Protons</th><th>Electrons placed</th></tr>
+        <tr><td id="b_p" class="big"></td><td id="b_e" class="big"></td></tr>
+      </table>
+      <h3>Electronic configuration so far</h3>
+      <div id="b_cfg" class="big" style="min-height:40px"></div>
+      <div>
+        <button class="btn" id="b_check">Check my atom</button>
+        <button class="btn ghost" id="b_reset">Clear</button>
+        <button class="btn alt" id="b_show">Show me</button>
+        <button class="btn gold" id="b_rand">Random atom</button>
+      </div>
+      <div id="b_msg" class="msg"></div>
+      <div id="b_where" class="hide">
+        <h3>Where it sits in the Periodic Table</h3>
+        <div id="b_pt"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TAB 2 -->
+<section class="tab" id="t2">
+  <div class="idea"><b>Shells and the Periodic Table are linked.</b> Number of occupied shells = <b>period</b>. Number of outer-shell electrons = <b>group</b> (Groups I–VII). A full outer shell = Group VIII/0.</div>
+  <div class="card">
+    <span class="score" id="m_score"></span>
+    <h2>Match &amp; Locate</h2>
+    <div>
+      <button class="btn ghost" data-mm="1">Diagram → written</button>
+      <button class="btn ghost" data-mm="2">Written → diagram</button>
+      <button class="btn ghost" data-mm="3">Diagram → Periodic Table</button>
+      <button class="btn ghost" data-mm="4">Periodic Table → diagram</button>
+    </div>
+    <div id="m_area" style="margin-top:10px"></div>
+    <div id="m_msg" class="msg"></div>
+    <button class="btn alt hide" id="m_next">Next question →</button>
+  </div>
+</section>
+
+<!-- TAB 3 -->
+<section class="tab" id="t3">
+  <div class="idea"><b>Valency</b> is the number of electrons an atom must lose, gain or share to get a full outer shell. Atoms take the <b>easier</b> route — the one that moves fewer electrons.</div>
+  <div class="row">
+    <div class="card" style="flex:0 0 auto;max-width:430px">
+      <h2>Pick an element</h2>
+      <div class="elgrid" id="v_grid"></div>
+      <div id="v_svg" style="text-align:center;margin-top:8px"></div>
+      <div class="muted" style="text-align:center">Dashed circles = gaps in the outer shell</div>
+      <div style="text-align:center">
+        <button class="btn" id="v_minus">− Take an electron away</button>
+        <button class="btn" id="v_plus">+ Add an electron</button>
+        <button class="btn ghost" id="v_reset">Reset atom</button>
+      </div>
+    </div>
+    <div class="card grow">
+      <h2 id="v_name"></h2>
+      <div id="v_info" style="font-size:18px;line-height:1.6"></div>
+      <div id="v_msg" class="msg"></div>
+      <div id="v_ask" class="hide">
+        <h3 id="v_q"></h3>
+        <div id="v_btns"></div>
+      </div>
+      <h3>Your results table</h3>
+      <div class="muted">Each element you solve is added here. Try at least one from every group.</div>
+      <table class="t" id="v_table"></table>
+      <button class="btn gold" id="v_rule">Spot the pattern</button>
+      <div id="v_rulebox" class="msg info hide"></div>
+    </div>
+  </div>
+</section>
+
+<!-- TAB 4 -->
+<section class="tab" id="t4">
+  <div class="idea"><b>Ionic compounds:</b> metal atoms give electrons to non-metal atoms. Every electron given away must be taken by someone, so the <b>total positive charge must equal the total negative charge</b>. That fixes the ratio of ions.</div>
+  <div class="row">
+    <div class="card grow">
+      <h2>Ionic Ratios</h2>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">
+        <label>Positive ion: <select id="i_cat"></select></label>
+        <label>Negative ion: <select id="i_an"></select></label>
+        <label><input type="checkbox" id="i_extra"> Include more ions (transition metals, compound ions)</label>
+      </div>
+      <div style="display:flex;justify-content:space-around;margin:10px 0;flex-wrap:wrap">
+        <div><button class="btn" id="i_cp">+ add</button><button class="btn ghost" id="i_cm">− remove</button> <b id="i_clab"></b></div>
+        <div><button class="btn" id="i_ap">+ add</button><button class="btn ghost" id="i_am">− remove</button> <b id="i_alab"></b></div>
+      </div>
+      <div class="ionbox"><div class="ioncol" id="i_cols1"></div><div class="ioncol" id="i_cols2"></div></div>
+      <div id="i_ratio" class="ratio hide"></div>
+      <h3>Charge check</h3>
+      <div style="display:grid;grid-template-columns:150px 1fr;gap:6px;align-items:center">
+        <div>Positive charge:</div><div class="units" id="i_pu"></div>
+        <div>Negative charge:</div><div class="units" id="i_nu"></div>
+      </div>
+      <div id="i_e" class="muted" style="margin-top:6px"></div>
+      <div id="i_msg" class="msg"></div>
+    </div>
+    <div class="card" style="flex:0 1 380px">
+      <h2>Challenge</h2>
+      <p>Get a compound name, then build it.</p>
+      <button class="btn gold" id="i_chal">New challenge</button>
+      <div id="i_target" class="big" style="font-size:24px;margin:8px 0"></div>
+      <div id="i_cmsg" class="msg"></div>
+      <div class="muted">Challenges completed: <b id="i_count">0</b></div>
+      <h3>The shortcut: cross-over</h3>
+      <div id="i_cross" class="legend">Build a neutral compound to see how the cross-over shortcut gives the same answer.</div>
+    </div>
+  </div>
+</section>
+
+<!-- TAB 5 -->
+<section class="tab" id="t5">
+  <div class="idea"><b>Covalent molecules:</b> non-metal atoms share pairs of electrons. Each atom has a fixed number of "bonding hands" (its valency). A molecule is finished when <b>every hand is holding another hand</b> — so the ratio of atoms is fixed.</div>
+  <div class="row">
+    <div class="card" style="flex:0 0 auto">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <label>Middle atom: <select id="c_a"></select></label>
+        <label>Joining atom: <select id="c_b"></select></label>
+        <button class="btn" id="c_add">+ Add joining atom</button>
+        <button class="btn ghost" id="c_rem">− Remove</button>
+      </div>
+      <div id="c_ratio" class="ratio hide"></div>
+      <div id="c_svg"></div>
+      <div class="legend">Each line = one shared pair of electrons (one electron from each atom). <span style="color:var(--bad);font-weight:bold">Red stubs</span> = empty hands still needing a partner.</div>
+    </div>
+    <div class="card grow">
+      <h2>Quick start</h2>
+      <div id="c_presets"></div>
+      <h3>Outer-shell check</h3>
+      <div class="muted">Own outer electrons + electrons shared in from bonds. Hydrogen needs 2, the rest need 8.</div>
+      <div class="chips" id="c_chips"></div>
+      <div id="c_msg" class="msg"></div>
+    </div>
+  </div>
+</section>
+
+<!-- TAB 6 -->
+<section class="tab" id="t6">
+  <div class="idea" id="l_idea"></div>
+  <div class="card">
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <div class="mode"><button id="l_me">Everyday examples</button><button id="l_mc">Chemistry examples</button></div>
+      <label>Problem: <select id="l_sel"></select></label>
+      <button class="btn ghost" id="l_reset">Start again</button>
+    </div>
+    <div id="l_words" class="big" style="font-size:22px;margin-top:10px"></div>
+    <div id="l_ctx" style="margin-top:4px;font-size:17px"></div>
+    <div id="l_stage" class="msg info"></div>
+    <div class="eq" id="l_eq"></div>
+    <div id="l_fmsg" class="msg"></div>
+    <div class="row" style="margin-top:8px">
+      <div class="grow" style="flex:1 1 300px">
+        <h3 id="l_th">Atom count</h3>
+        <table class="t" id="l_tally"></table>
+      </div>
+      <div class="grow" style="flex:2 1 500px">
+        <h3>Picture</h3>
+        <div class="parts"><div class="pbox"><h4 id="l_hl">Reactants</h4><div class="mols" id="l_pl"></div></div><div class="pbox"><h4 id="l_hr">Products</h4><div class="mols" id="l_pr"></div></div></div>
+      </div>
+    </div>
+    <div id="l_note" class="muted" style="margin-top:6px"></div>
+    <div id="l_ratio" class="ratio hide"></div>
+    <div id="l_msg" class="msg"></div>
+  </div>
+</section>
+
+<!-- TAB 7 -->
+<section class="tab" id="t7">
+  <div class="idea"><b>Equation Quiz.</b> Equations from (and like those in) Earl &amp; Wilford. Type the big numbers in front. Leave a box empty for 1. Use the smallest whole numbers.</div>
+  <div class="card">
+    <span class="score" id="q_score"></span>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <b>Level:</b>
+      <button class="btn ghost" data-lv="1">1 · Starter</button>
+      <button class="btn ghost" data-lv="2">2 · Core</button>
+      <button class="btn ghost" data-lv="3">3 · Challenge</button>
+      <button class="btn ghost" data-lv="0">Mixed</button>
+    </div>
+    <div id="q_area" style="margin-top:10px"></div>
+  </div>
+</section>
+
+<!-- TAB 8 -->
+<section class="tab" id="t8">
+  <div class="idea"><b>Extraction challenges.</b> Follow a real process from ore to product, one step at a time. Each step uses a different skill from the Stoichiometry lessons. The next step opens when you get the answer right or look at the working.</div>
+  <div class="row">
+    <div class="card grow" style="flex:3 1 600px">
+      <div id="x_pick"></div>
+      <div id="x_area"></div>
+    </div>
+    <div class="card" style="flex:1 1 260px">
+      <h2>Data</h2>
+      <div class="data">Relative atomic masses (Aᵣ):<br>H = 1 · C = 12 · O = 16 · Al = 27<br>Cl = 35.5 · Ca = 40 · Fe = 56<br><br>1 mol of any gas at r.t.p. = <b>24 dm³</b><br>Avogadro constant = <b>6.02 × 10²³</b></div>
+      <h3>Key formulae</h3>
+      <div class="legend">n = m ÷ M<br>m = n × M<br>V (gas) = n × 24<br>particles = n × 6.02 × 10²³<br>n = c × V (V in dm³)<br>% purity = (mass pure ÷ mass sample) × 100<br>% yield = (actual ÷ theoretical) × 100</div>
+      <div class="muted" style="margin-top:8px">Answers within 1% are accepted, so rounding to 3 significant figures is fine.</div>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer>Combining Ratios Lab · Cambridge IGCSE Chemistry · Equations based on Earl &amp; Wilford, Cambridge IGCSE Chemistry 4th Ed. (Hodder, 2021)</footer>
+
+<script>
+/* ================= COMMON DATA ================= */
+const $=id=>document.getElementById(id);
+const EL=[null,
+ ['H','Hydrogen',1,1],['He','Helium',8,1],['Li','Lithium',1,2],['Be','Beryllium',2,2],['B','Boron',3,2],['C','Carbon',4,2],['N','Nitrogen',5,2],['O','Oxygen',6,2],['F','Fluorine',7,2],['Ne','Neon',8,2],
+ ['Na','Sodium',1,3],['Mg','Magnesium',2,3],['Al','Aluminium',3,3],['Si','Silicon',4,3],['P','Phosphorus',5,3],['S','Sulfur',6,3],['Cl','Chlorine',7,3],['Ar','Argon',8,3],
+ ['K','Potassium',1,4],['Ca','Calcium',2,4]].map((e,i)=>e&&({z:i,s:e[0],n:e[1],g:e[2],p:e[3]}));
+const CAPS=[2,8,8,2];
+const ROMAN=['','I','II','III','IV','V','VI','VII','VIII/0'];
+function cfgOf(n){const r=[];let l=n;for(const c of CAPS){if(l<=0)break;const t=Math.min(c,l);r.push(t);l-=t;}return r;}
+const fc=a=>a.join(', ');
+const sum=a=>a.reduce((x,y)=>x+y,0);
+const gcd=(a,b)=>b?gcd(b,a%b):a;
+const gcdA=a=>a.reduce((x,y)=>gcd(x,y));
+const rnd=n=>Math.floor(Math.random()*n);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;};
+const SUP={'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+function chg(q){if(q===0)return '';const m=Math.abs(q);return (m>1?SUP[m]:'')+(q>0?'⁺':'⁻');}
+const F=f=>'<span class="formula">'+f.replace(/(\d+)/g,'<sub>$1</sub>')+'</span>';
+function valOf(e){if(e.g===8)return 0;if(e.z===1)return 1;return e.g<=4?e.g:8-e.g;}
+function setMsg(id,cls,html){const m=$(id);m.className='msg '+(cls||'');m.innerHTML=html||'';}
+
+function atomSVG(cfg,o={}){
+  const S=o.size||240,c=S/2,nr=S*0.12,n=Math.max(cfg.length,o.rings||0,1),den=Math.max(n,3);
+  const rad=i=>nr+(i+1)*(S/2-8-nr)/den;
+  const er=Math.max(4.5,S*0.028);
+  let s=`<svg width="${S}" height="${S}" viewBox="0 0 ${S} ${S}">`;
+  for(let i=0;i<n;i++)s+=`<circle cx="${c}" cy="${c}" r="${rad(i)}" fill="none" stroke="#9fb0bf" stroke-width="1.6"/>`;
+  s+=`<circle cx="${c}" cy="${c}" r="${nr}" fill="#16324A"/>`;
+  if(o.nuc!==undefined)s+=`<text x="${c}" y="${c+S*0.025}" text-anchor="middle" fill="#fff" font-size="${Math.max(13,S*0.075)}" font-weight="bold" font-family="Calibri,Arial">${o.nuc}</text>`;
+  cfg.forEach((k,i)=>{
+    const outer=i===cfg.length-1, cap=i===0?2:8;
+    const slots=(o.gaps&&outer&&k<cap)?cap:k;
+    for(let j=0;j<slots;j++){
+      const a=-Math.PI/2+j*2*Math.PI/slots, x=c+rad(i)*Math.cos(a), y=c+rad(i)*Math.sin(a);
+      if(j<k)s+=`<circle cx="${x}" cy="${y}" r="${er}" fill="#D9A441" stroke="#16324A" stroke-width="1.2"/>`;
+      else s+=`<circle cx="${x}" cy="${y}" r="${er}" fill="#fff" stroke="#c0392b" stroke-width="1.4" stroke-dasharray="3 2"/>`;
+    }
+  });
+  return s+'</svg>';
+}
+
+function ptable(o={}){
+  const box=document.createElement('div');box.className='ptable';
+  const add=(cls,html)=>{const d=document.createElement('div');d.className=cls;d.innerHTML=html;box.appendChild(d);return d;};
+  add('hd','');for(let g=1;g<=8;g++)add('hd','Group<br>'+ROMAN[g]);
+  for(let p=1;p<=4;p++){
+    add('hd','Period '+p);
+    for(let g=1;g<=8;g++){
+      const e=EL.find(x=>x&&x.p===p&&x.g===g);
+      if(!e){add('void','');continue;}
+      const d=add('cell',o.symbols?`${e.s}<small>${e.z}</small>`:'');
+      if(o.hl===e.z)d.classList.add('hl');
+      if(o.marks&&o.marks[e.z])d.classList.add(o.marks[e.z]);
+      if(o.onPick){d.classList.add('click');d.onclick=()=>o.onPick(e.z);}
+    }
+  }
+  return box;
+}
+
+/* ================= TABS ================= */
+const TABS=['Electron Shells','Match & Locate','Valency','Ionic Ratios','Covalent Ratios','Balancing Lab','Equation Quiz','Extraction Challenges'];
+TABS.forEach((t,i)=>{const b=document.createElement('button');b.innerHTML=`<span class="num">${i+1}</span>${t}`;b.onclick=()=>showTab(i+1);$('nav').appendChild(b);});
+function showTab(k){document.querySelectorAll('nav button').forEach((b,i)=>b.classList.toggle('on',i===k-1));document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('on',i===k-1));}
+
+/* ================= TAB 1: BUILD ================= */
+const B={z:11,e:[0,0,0,0],timer:null};
+for(let z=1;z<=20;z++){const o=document.createElement('option');o.value=z;o.textContent=`${z} — ${EL[z].n} (${EL[z].s})`;$('b_sel').appendChild(o);}
+$('b_sel').onchange=()=>bSet(+$('b_sel').value);
+$('b_myst').onchange=()=>{$('b_sel').classList.toggle('hide',$('b_myst').checked);if($('b_myst').checked)bSet(1+rnd(20));else bRender();};
+$('b_rand').onclick=()=>bSet(1+rnd(20));
+$('b_reset').onclick=()=>{bStop();B.e=[0,0,0,0];setMsg('b_msg');$('b_where').classList.add('hide');bRender();};
+$('b_check').onclick=bCheck;
+$('b_show').onclick=bShow;
+function bStop(){if(B.timer){clearInterval(B.timer);B.timer=null;}}
+function bSet(z){bStop();B.z=z;B.e=[0,0,0,0];$('b_sel').value=z;setMsg('b_msg');$('b_where').classList.add('hide');bRender();}
+function bName(){return $('b_myst').checked?'Mystery atom':`${EL[B.z].n} (${EL[B.z].s})`;}
+function bRender(){
+  $('b_title').textContent='Build an atom: '+bName();
+  const S=400,c=S/2,nr=40,rad=[78,112,146,180];
+  const NS='http://www.w3.org/2000/svg';
+  const svg=document.createElementNS(NS,'svg');svg.setAttribute('width',S);svg.setAttribute('height',S);svg.setAttribute('viewBox',`0 0 ${S} ${S}`);
+  const mk=(t,a)=>{const el=document.createElementNS(NS,t);for(const k in a)el.setAttribute(k,a[k]);svg.appendChild(el);return el;};
+  rad.forEach((r,i)=>{
+    mk('circle',{cx:c,cy:c,r,fill:'none',stroke:'#9fb0bf','stroke-width':2});
+    const hit=mk('circle',{cx:c,cy:c,r,fill:'none',stroke:'rgba(46,143,138,0)','stroke-width':26,style:'cursor:pointer'});
+    hit.onmouseenter=()=>hit.setAttribute('stroke','rgba(46,143,138,.18)');
+    hit.onmouseleave=()=>hit.setAttribute('stroke','rgba(46,143,138,0)');
+    hit.onclick=()=>bAdd(i);
+    const lab=mk('text',{x:c+r*Math.cos(-0.62)+4,y:c+r*Math.sin(-0.62)-4,'font-size':14,fill:'#5a6b78','font-family':'Calibri,Arial'});lab.textContent='Shell '+(i+1);
+  });
+  mk('circle',{cx:c,cy:c,r:nr,fill:'#16324A'});
+  const t=mk('text',{x:c,y:c+7,'text-anchor':'middle',fill:'#fff','font-size':22,'font-weight':'bold','font-family':'Calibri,Arial'});t.textContent=B.z+' p⁺';
+  B.e.forEach((k,i)=>{for(let j=0;j<k;j++){const a=-Math.PI/2+j*2*Math.PI/k;
+    const d=mk('circle',{cx:c+rad[i]*Math.cos(a),cy:c+rad[i]*Math.sin(a),r:10,fill:'#D9A441',stroke:'#16324A','stroke-width':1.5,style:'cursor:pointer'});
+    d.onclick=ev=>{ev.stopPropagation();bRemove(i);};}});
+  $('b_svg').innerHTML='';$('b_svg').appendChild(svg);
+  $('b_p').textContent=B.z;$('b_e').textContent=sum(B.e);
+  $('b_e').style.color=sum(B.e)===B.z?'var(--ok)':'var(--navy)';
+  const used=B.e.slice(0,B.e.reduce((m,v,i)=>v>0?i+1:m,0));
+  $('b_cfg').textContent=used.length?fc(used):'—';
+}
+function bAdd(i){
+  if(B.timer)return;
+  const tot=sum(B.e);
+  if(tot>=B.z){setMsg('b_msg','warn',`You have already placed ${B.z} electrons. A neutral atom has the <b>same number of electrons as protons</b> (${B.z}).`);return;}
+  if(B.e[i]>=CAPS[i]){setMsg('b_msg','warn',`Shell ${i+1} is full — it can only hold <b>${CAPS[i]}</b> electrons. The next electron must go in the next shell out.`);return;}
+  B.e[i]++;
+  const gap=B.e.slice(0,i).findIndex((v,j)=>v<CAPS[j]);
+  if(gap>=0)setMsg('b_msg','warn',`Careful: shell ${gap+1} is not full yet. Electrons fill the shells <b>closest to the nucleus first</b>.`);
+  else setMsg('b_msg');
+  bRender();
+}
+function bRemove(i){if(B.timer)return;B.e[i]--;setMsg('b_msg');bRender();}
+function bCheck(){
+  const want=cfgOf(B.z),tot=sum(B.e);
+  const used=B.e.slice(0,B.e.reduce((m,v,i)=>v>0?i+1:m,0));
+  if(tot!==B.z){setMsg('b_msg','bad',`Not yet. There are <b>${B.z} protons</b>, so you need <b>${B.z} electrons</b>. You have placed ${tot}.`);return;}
+  if(fc(used)!==fc(want)){
+    const gap=B.e.findIndex((v,j)=>v<CAPS[j]&&B.e.slice(j+1).some(x=>x>0));
+    setMsg('b_msg','bad',`The right number of electrons, but not in the right shells. ${gap>=0?`Shell ${gap+1} must be full before electrons go further out.`:''} Fill shell 1 (max 2), then shell 2 (max 8), then shell 3 (max 8).`);return;}
+  const e=EL[B.z],n=want.length,out=want[n-1];
+  setMsg('b_msg','ok',`Correct! ${$('b_myst').checked?`It is <b>${e.n} (${e.s})</b>. `:''}Configuration <b>${fc(want)}</b>.<br>
+   • ${n} occupied shell${n>1?'s':''} → <b>Period ${n}</b><br>
+   • ${out} electron${out>1?'s':''} in the outer shell → ${e.g===8?'outer shell is <b>full</b> → <b>Group VIII/0</b> (noble gas)':'<b>Group '+ROMAN[e.g]+'</b>'}`);
+  $('b_where').classList.remove('hide');$('b_pt').innerHTML='';$('b_pt').appendChild(ptable({symbols:true,hl:B.z}));
+}
+function bShow(){
+  bStop();B.e=[0,0,0,0];setMsg('b_msg','info','Watch: shell 1 fills first (2), then shell 2 (8), then shell 3 (8), then shell 4.');bRender();
+  B.timer=setInterval(()=>{const tot=sum(B.e);if(tot>=B.z){bStop();bCheck();return;}const i=B.e.findIndex((v,j)=>v<CAPS[j]);B.e[i]++;bRender();},280);
+}
+
+/* ================= TAB 2: MATCH ================= */
+const M={mode:1,q:0,score:0,N:10,z:0,done:false,last:0};
+document.querySelectorAll('[data-mm]').forEach(b=>b.onclick=()=>mStart(+b.dataset.mm));
+$('m_next').onclick=mNext;
+function mStart(m){M.mode=m;M.q=0;M.score=0;document.querySelectorAll('[data-mm]').forEach(b=>b.classList.toggle('sel',+b.dataset.mm===m));mNext();}
+function distract(z){
+  const right=fc(cfgOf(z)),c=[];
+  [z-1,z+1,z-2,z+2,z+8,z-8].forEach(k=>{if(k>=1&&k<=20)c.push(cfgOf(k));});
+  const cf=cfgOf(z);
+  if(z>2)c.push([2,z-2]);
+  if(cf.length>1)c.push(cf.slice().reverse());
+  if(z>3&&z<=10)c.push([3,z-3]);
+  if(z>10&&z<=20)c.push([2,8,z-10]);
+  const uniq=[];const seen=new Set([right]);
+  shuffle(c).forEach(a=>{const k=fc(a);if(!seen.has(k)&&a.every(x=>x>0)){seen.add(k);uniq.push(a);}});
+  // prefer one neighbour and one wrong-fill
+  return uniq.slice(0,3);
+}
+function why(z){const e=EL[z],cf=cfgOf(z),n=cf.length,o=cf[n-1];
+  return `${e.n} (${e.s}): <b>${fc(cf)}</b> → ${n} shell${n>1?'s':''} = Period ${n}; ${e.g===8?'full outer shell = Group VIII/0':o+' outer electron'+(o>1?'s':'')+' = Group '+ROMAN[e.g]}.`;}
+function mNext(){
+  $('m_next').classList.add('hide');setMsg('m_msg');
+  if(M.q>=M.N){$('m_area').innerHTML=`<div class="big">Round finished: ${M.score} / ${M.N}</div><p>Pick a mode above to play again, or try a different mode.</p>`;$('m_score').textContent=`${M.score}/${M.N}`;return;}
+  let z;do{z=1+rnd(20);}while(z===M.last);M.last=z;M.z=z;M.done=false;M.q++;
+  $('m_score').textContent=`Q ${M.q}/${M.N} · Score ${M.score}`;
+  const A=$('m_area');A.innerHTML='';
+  const cf=cfgOf(z);
+  const opts=shuffle([cf,...distract(z)]);
+  const mkOpts=(asDiagram)=>{const w=document.createElement('div');w.className='opts';
+    opts.forEach(a=>{const b=document.createElement('button');b.className='opt';b.innerHTML=asDiagram?atomSVG(a,{size:170}):fc(a);
+      b.onclick=()=>{if(M.done)return;mAnswer(fc(a)===fc(cf));b.classList.add(fc(a)===fc(cf)?'okc':'badc');
+        if(fc(a)!==fc(cf))w.children[opts.findIndex(x=>fc(x)===fc(cf))].classList.add('okc');};
+      w.appendChild(b);});return w;};
+  if(M.mode===1){A.innerHTML=`<h3>Which written configuration matches this atom?</h3>${atomSVG(cf,{size:260,nuc:'?'})}`;A.appendChild(mkOpts(false));}
+  if(M.mode===2){A.innerHTML=`<h3>Which diagram shows this configuration?</h3><div class="big">${fc(cf)}</div>`;A.appendChild(mkOpts(true));}
+  if(M.mode===3){A.innerHTML=`<h3>Click where this atom belongs in the Periodic Table.</h3><div class="row"><div>${atomSVG(cf,{size:260,nuc:'?'})}</div><div id="m_pt"></div></div>`;
+    const draw=marks=>{$('m_pt').innerHTML='';$('m_pt').appendChild(ptable({symbols:M.done,marks,onPick:M.done?null:k=>{M.done=false;const ok=k===z;const mk={};mk[z]='okc';if(!ok)mk[k]='badc';mAnswer(ok);draw(mk);}}));};draw({});}
+  if(M.mode===4){A.innerHTML=`<h3>Which diagram shows the atom in the gold square?</h3><div id="m_pt"></div>`;$('m_pt').appendChild(ptable({symbols:false,hl:z}));A.appendChild(mkOpts(true));}
+}
+function mAnswer(ok){
+  M.done=true;if(ok)M.score++;
+  $('m_score').textContent=`Q ${M.q}/${M.N} · Score ${M.score}`;
+  setMsg('m_msg',ok?'ok':'bad',(ok?'Correct! ':'Not quite. ')+why(M.z));
+  $('m_next').classList.remove('hide');
+}
+
+/* ================= TAB 3: VALENCY ================= */
+const V={z:12,n:12,rec:{},asked:false};
+for(let z=1;z<=20;z++){const b=document.createElement('button');b.textContent=EL[z].s;b.title=EL[z].n;b.onclick=()=>vSet(z);$('v_grid').appendChild(b);}
+$('v_minus').onclick=()=>{if(V.n<=0)return;V.n--;vRender();};
+$('v_plus').onclick=()=>{if(V.n>=20){setMsg('v_msg','warn','This simple model stops at 20 electrons.');return;}V.n++;vRender();};
+$('v_reset').onclick=()=>{V.n=V.z;vRender();};
+$('v_rule').onclick=()=>{const b=$('v_rulebox');b.classList.toggle('hide');b.innerHTML=`<b>The pattern</b><br>
+ • Groups I–III (metals): valency = group number. They <b>lose</b> electrons → positive ions.<br>
+ • Group IV (C, Si): valency 4. Moving 4 electrons either way is too hard, so they <b>share</b>.<br>
+ • Groups V–VII (non-metals): valency = 8 − group number. They <b>gain</b> (or share) electrons → negative ions.<br>
+ • Group VIII/0: valency 0 — the outer shell is already full.<br>
+ • The charge on an ion has the same size as the valency.`;};
+function vSet(z){V.z=z;V.n=z;V.asked=false;vRender();}
+function vDir(e){if(e.z===1)return 'loses 1 (or shares 1)';if(e.g===8)return '—';if(e.g===4)return 'shares 4';return e.g<4?'loses '+e.g:'gains '+(8-e.g);}
+function vIon(e){if(e.z===1)return 'H⁺';if(e.g===8)return 'none';if(e.g===4)return 'shares instead';return e.s+chg(e.g<4?e.g:-(8-e.g));}
+function vRender(){
+  const e=EL[V.z],cf=cfgOf(V.n),q=V.z-V.n;
+  [...$('v_grid').children].forEach((b,i)=>{b.classList.toggle('cur',i+1===V.z);b.classList.toggle('done',!!V.rec[i+1]);});
+  $('v_name').textContent=`${e.n} (${e.s}) — Group ${ROMAN[e.g]}`;
+  $('v_svg').innerHTML=atomSVG(cf,{size:300,nuc:V.z+'p⁺',gaps:true,rings:cfgOf(V.z).length});
+  const out=cf.length?cf[cf.length-1]:0,cap=cf.length<=1?2:8;
+  const full=[2,10,18].includes(V.n);
+  $('v_info').innerHTML=`Protons: <b>${V.z}</b> · Electrons: <b>${V.n}</b> · Configuration: <b>${cf.length?fc(cf):'none'}</b><br>
+   Charge: <b>${q===0?'0 (neutral atom)':(q>0?'+':'−')+Math.abs(q)}</b> → ${q===0?e.s+' atom':'<b>'+e.s+chg(q)+'</b> ion'}<br>
+   Outer shell: ${full?'<b style="color:var(--ok)">FULL ✓</b>':(V.n===0?'no electrons left':`${out} of ${cap} — <b>${cap-out}</b> gap${cap-out!==1?'s':''}`)}`;
+  const moved=Math.abs(q);
+  $('v_ask').classList.add('hide');
+  if(V.rec[V.z]&&!full){setMsg('v_msg','info','Already in your table. Explore more, or pick another element.');}
+  else if(full||(V.z===1&&V.n===0)){
+    let t='';
+    if(e.g===8&&moved===0)t=`${e.n} already has a full outer shell. It has no need to lose, gain or share electrons.`;
+    else if(V.z===1&&V.n===0)t=`Hydrogen lost its only electron → H⁺. That took 1 electron.`;
+    else{const best=valOf(e);t=`Full outer shell reached by ${q>0?'losing':'gaining'} <b>${moved}</b> electron${moved>1?'s':''}.`;
+      if(moved>best)t+=` That is a lot of electrons to move! ${q>0?'Gaining':'Losing'} just ${best} would also give a full shell — atoms always take the <b>easier</b> route.`;
+      else if(e.g===4)t+=` Carbon and silicon would need to move 4 electrons either way, which is very hard. Instead they <b>share</b> 4 electrons in covalent bonds.`;}
+    setMsg('v_msg',moved>valOf(e)?'warn':'ok',t);
+    if(!V.rec[V.z]){$('v_ask').classList.remove('hide');$('v_q').textContent=`So, what is the valency of ${e.n}?`;
+      $('v_btns').innerHTML='';[0,1,2,3,4].forEach(k=>{const b=document.createElement('button');b.className='btn ghost';b.textContent=k;b.onclick=()=>vAnswer(k);$('v_btns').appendChild(b);});}
+  } else {
+    const best=valOf(e);
+    setMsg('v_msg','info',e.g===8?'Noble gas — already full. Reset to see.':`Find the <b>quickest</b> way to a full outer shell: take electrons away, or add them?`);
+  }
+  vTable();
+}
+function vAnswer(k){const e=EL[V.z],v=valOf(e);
+  if(k!==v){setMsg('v_msg','bad',`Not quite. Valency = the number of electrons moved by the <b>easier</b> route. ${e.g===8?'Nothing needs to move.':`${e.n} has ${cfgOf(e.z).slice(-1)[0]} outer electron(s): it is easier to ${e.g<=4||e.z===1?'lose '+v:'gain '+v}.`}`);return;}
+  V.rec[V.z]=true;setMsg('v_msg','ok',`Yes — valency of ${e.n} = <b>${v}</b>. Added to your table.`);$('v_ask').classList.add('hide');vTable();
+  [...$('v_grid').children].forEach((b,i)=>b.classList.toggle('done',!!V.rec[i+1]));}
+function vTable(){
+  const rows=Object.keys(V.rec).map(Number).sort((a,b)=>a-b);
+  let h='<tr><th>Element</th><th>Group</th><th>Outer electrons</th><th>Loses / gains / shares</th><th>Valency</th><th>Ion</th></tr>';
+  if(!rows.length)h+='<tr><td colspan="6" class="muted">No elements yet</td></tr>';
+  rows.forEach(z=>{const e=EL[z];h+=`<tr><td>${e.n} (${e.s})</td><td>${ROMAN[e.g]}</td><td>${cfgOf(z).slice(-1)[0]}</td><td>${vDir(e)}</td><td><b>${valOf(e)}</b></td><td>${vIon(e)}</td></tr>`;});
+  $('v_table').innerHTML=h;
+}
+
+/* ================= TAB 4: IONIC ================= */
+const CAT=[['Li','lithium',1],['Na','sodium',1],['K','potassium',1],['Mg','magnesium',2],['Ca','calcium',2],['Al','aluminium',3],
+  ['Fe','iron(II)',2,1],['Fe','iron(III)',3,1],['Cu','copper(II)',2,1],['Zn','zinc',2,1],['Ag','silver',1,1],['NH4','ammonium',1,1,1]];
+const AN=[['F','fluoride',1],['Cl','chloride',1],['Br','bromide',1],['O','oxide',2],['S','sulfide',2],['N','nitride',3],
+  ['OH','hydroxide',1,1,1],['NO3','nitrate',1,1,1],['SO4','sulfate',2,1,1],['CO3','carbonate',2,1,1]];
+const ELNAME={Fe:'iron',Cu:'copper',Zn:'zinc',Ag:'silver',Li:'lithium',Na:'sodium',K:'potassium',Mg:'magnesium',Ca:'calcium',Al:'aluminium',F:'fluorine',Cl:'chlorine',Br:'bromine',O:'oxygen',S:'sulfur',N:'nitrogen'};
+const I={c:3,a:1,nc:1,na:1,target:null,count:0};
+function iFill(){const ex=$('i_extra').checked;
+  const fill=(sel,list,cur)=>{sel.innerHTML='';list.forEach((x,i)=>{if(x[3]&&!ex)return;const o=document.createElement('option');o.value=i;o.innerHTML=`${x[0].replace(/(\d)/g,m=>'₀₁₂₃₄₅₆₇₈₉'[m])}${chg(x[2]*(list===AN?-1:1))}  ${x[1]}`;sel.appendChild(o);});
+    if([...sel.options].some(o=>+o.value===cur))sel.value=cur;};
+  fill($('i_cat'),CAT,I.c);fill($('i_an'),AN,I.a);I.c=+$('i_cat').value;I.a=+$('i_an').value;}
+$('i_extra').onchange=()=>{iFill();iRender();};
+$('i_cat').onchange=()=>{I.c=+$('i_cat').value;I.nc=1;I.na=1;iRender();};
+$('i_an').onchange=()=>{I.a=+$('i_an').value;I.nc=1;I.na=1;iRender();};
+$('i_cp').onclick=()=>{if(I.nc<6){I.nc++;iRender();}};
+$('i_cm').onclick=()=>{if(I.nc>1){I.nc--;iRender();}};
+$('i_ap').onclick=()=>{if(I.na<6){I.na++;iRender();}};
+$('i_am').onclick=()=>{if(I.na>1){I.na--;iRender();}};
+$('i_chal').onclick=()=>{const ex=$('i_extra').checked;const cs=CAT.map((x,i)=>i).filter(i=>ex||!CAT[i][3]),as=AN.map((x,i)=>i).filter(i=>ex||!AN[i][3]);
+  I.target=[cs[rnd(cs.length)],as[rnd(as.length)]];$('i_target').textContent='Build: '+CAT[I.target[0]][1]+' '+AN[I.target[1]][1];setMsg('i_cmsg','info','Choose the ions, then add ions until the charges cancel.');};
+const sub=s=>s.replace(/(\d+)/g,'<sub>$1</sub>');
+function part(f,n,poly){if(n===1)return f;return poly?`(${f})${n}`:f+n;}
+function iRender(){
+  const c=CAT[I.c],a=AN[I.a],qp=c[2],qn=a[2];
+  const cIon=sub(c[0])+'<sup>'+chg(qp)+'</sup>',aIon=sub(a[0])+'<sup>'+chg(-qn)+'</sup>';
+  $('i_clab').innerHTML=cIon;$('i_alab').innerHTML=aIon;
+  $('i_cols1').innerHTML=Array(I.nc).fill(`<div class="ion p">${cIon}</div>`).join('');
+  $('i_cols2').innerHTML=Array(I.na).fill(`<div class="ion n">${aIon}</div>`).join('');
+  const P=I.nc*qp,N=I.na*qn;
+  $('i_pu').innerHTML=Array(P).fill('<div class="u p">+</div>').join('')+` <b>&nbsp;+${P}</b>`;
+  $('i_nu').innerHTML=Array(N).fill('<div class="u n">−</div>').join('')+` <b>&nbsp;−${N}</b>`;
+  if(!c[4]&&!a[4]&&ELNAME[c[0]]&&ELNAME[a[0]])
+    $('i_e').innerHTML=`Each ${ELNAME[c[0]]} atom gives away ${qp} electron${qp>1?'s':''} → total given: <b>${P}</b>. Each ${ELNAME[a[0]]} atom takes ${qn} → total taken: <b>${N}</b>.`;
+  else $('i_e').innerHTML='Compound ions (like OH⁻ or SO₄²⁻) are groups of atoms that carry a charge. Treat each one as a single unit.';
+  const formula=part(c[0],I.nc,c[4])+part(a[0],I.na,a[4]);$('i_ratio').classList.add('hide');
+  if(P!==N){setMsg('i_msg','warn',`Total charge = ${P-N>0?'+':'−'}${Math.abs(P-N)}. Not neutral yet — ${P>N?'add more negative ions':'add more positive ions'}.`);$('i_cross').innerHTML='Build a neutral compound to see how the cross-over shortcut gives the same answer.';return;}
+  const g=gcd(I.nc,I.na);
+  if(g>1){setMsg('i_msg','warn',`The charges cancel (+${P} and −${N}), but this is not the <b>simplest</b> ratio. Divide both numbers by ${g}.`);return;}
+  $('i_ratio').classList.remove('hide');
+  {const U=t=>t.replace(/(\d)/g,m=>'₀₁₂₃₄₅₆₇₈₉'[m]);var cIonB=U(c[0])+chg(qp),aIonB=U(a[0])+chg(-qn);}
+  $('i_ratio').innerHTML=`<div class="rl">Ratio of ions in ${c[1]} ${a[1]}</div><div class="rv"><span class="who">${cIonB} : ${aIonB}</span>&nbsp;&nbsp;${I.nc} : ${I.na}</div><div class="rs">For every <b>${I.nc}</b> ${cIonB} ion${I.nc>1?'s':''} there ${I.na>1?'are':'is'} <b>${I.na}</b> ${aIonB} ion${I.na>1?'s':''} → <b>${sub(formula)}</b></div>`;
+  setMsg('i_msg','ok',`<span class="big">${sub(formula)}</span> — ${c[1]} ${a[1]}<br>Ratio of ions = <b>${I.nc} : ${I.na}</b>. Total charge = (+${qp} × ${I.nc}) + (−${qn} × ${I.na}) = 0 ✓`);
+  $('i_cross').innerHTML=`1. Write the charge size (valency) of each ion: ${sub(c[0])} → <b>${qp}</b>, ${sub(a[0])} → <b>${qn}</b><br>2. Swap them over: ${sub(c[0])} gets ${qn}, ${sub(a[0])} gets ${qp}<br>3. Simplify if possible${gcd(qp,qn)>1?` (÷ ${gcd(qp,qn)})`:''} and drop any 1s<br>→ <b>${sub(formula)}</b>${(c[4]&&I.nc>1)||(a[4]&&I.na>1)?'<br>Brackets keep a compound ion together when there is more than one.':''}`;
+  if(I.target&&I.target[0]===I.c&&I.target[1]===I.a){I.count++;$('i_count').textContent=I.count;setMsg('i_cmsg','ok',`Challenge complete: ${c[1]} ${a[1]} = <b>${sub(formula)}</b>`);I.target=null;}
+}
+
+/* ================= TAB 5: COVALENT ================= */
+const NM={H:[1,1],C:[4,4],N:[3,5],O:[2,6],F:[1,7],Si:[4,4],P:[3,5],S:[2,6],Cl:[1,7]};
+const COL={H:'#f2f2f2',He:'#ddd',C:'#444',N:'#3b6fd8',O:'#d9443b',F:'#9be36b',Cl:'#3fae4a',Br:'#a33',I:'#7a3ea8',Na:'#8e5bd1',K:'#b05fc4',Li:'#c57bd6',Mg:'#2E8F8A',Ca:'#c98a3a',Al:'#9aa7b3',Fe:'#b5651d',Cu:'#d08a52',Zn:'#7f8fa6',S:'#e0c23a',P:'#e88a2c',Si:'#c9b38a',Ba:'#46a0a0',Ag:'#b9bec4',Pb:'#5d6670'};
+const DARK=new Set(['C','N','Cl','Na','K','Mg','Fe','I','Br','Ba','Pb','O','Li','Ca','Cu','Zn']);
+const CNAME={CH4:'methane',NH3:'ammonia',H2O:'water',HCl:'hydrogen chloride',H2S:'hydrogen sulfide',HF:'hydrogen fluoride',CO2:'carbon dioxide',CCl4:'tetrachloromethane',PCl3:'phosphorus trichloride',SiH4:'silane',CS2:'carbon disulfide',PH3:'phosphine',NCl3:'nitrogen trichloride',SiCl4:'silicon tetrachloride',SiO2:'silicon dioxide (a giant structure in real life — but the ratio is the same)',OF2:'oxygen difluoride',CF4:'tetrafluoromethane',H2:'hydrogen',O2:'oxygen',N2:'nitrogen',Cl2:'chlorine',F2:'fluorine',SiF4:'silicon tetrafluoride',NF3:'nitrogen trifluoride',PF3:'phosphorus trifluoride',SCl2:'sulfur dichloride',OCl2:'dichlorine oxide (usually written Cl₂O)',SiS2:'silicon disulfide'};
+const C={a:'C',b:'H',n:0};
+Object.keys(NM).forEach(k=>{['c_a','c_b'].forEach(id=>{const o=document.createElement('option');o.value=k;o.textContent=`${k} — valency ${NM[k][0]}`;$(id).appendChild(o);});});
+[['C','H'],['N','H'],['O','H'],['Cl','H'],['C','O'],['C','Cl'],['H','H'],['Cl','Cl'],['O','O'],['N','N']].forEach(([a,b])=>{
+  const want=NM[a][0]/NM[b][0];const f=cFormula(a,b,want);const bt=document.createElement('button');bt.className='btn ghost';bt.innerHTML=F(f);bt.onclick=()=>{C.a=a;C.b=b;C.n=0;$('c_a').value=a;$('c_b').value=b;cRender();};$('c_presets').appendChild(bt);});
+$('c_a').onchange=()=>{C.a=$('c_a').value;C.n=0;cRender();};
+$('c_b').onchange=()=>{C.b=$('c_b').value;C.n=0;cRender();};
+$('c_add').onclick=()=>{const v=NM[C.a][0],w=NM[C.b][0];if(C.n<Math.floor(v/w)+1&&C.n<5){C.n++;cRender();}};
+$('c_rem').onclick=()=>{if(C.n>0){C.n--;cRender();}};
+function cFormula(a,b,n){if(a===b)return a+(n+1);if(b==='H'&&(NM[a][1]>=6))return 'H'+(n>1?n:'')+a;return a+b+(n>1?n:'');}
+function cRender(){
+  let swapped=false;
+  if(NM[C.a][0]<NM[C.b][0]){[C.a,C.b]=[C.b,C.a];$('c_a').value=C.a;$('c_b').value=C.b;swapped=true;}
+  const v=NM[C.a][0],w=NM[C.b][0];
+  const S=480,cx=S/2,cy=S/2,R=150,ra=40,rb=C.a===C.b?40:32;
+  $('c_ratio').classList.add('hide');
+  if(v%w!==0){$('c_svg').innerHTML=`<svg width="${S}" height="${S}"></svg>`;$('c_chips').innerHTML='';
+    setMsg('c_msg','warn',`${C.a} has ${v} hands and each ${C.b} has ${w}. ${v} hands can't be shared out evenly in groups of ${w}, so this simple model can't make a molecule from just these two elements. Try another pair.`);return;}
+  let rem=v;const m=[];for(let i=0;i<C.n;i++){const k=Math.min(w,rem);m.push(k);rem-=k;}
+  const start=C.n<=2?0:-90;
+  const ang=i=>(start+i*360/Math.max(C.n,1))*Math.PI/180;
+  let s=`<svg width="${S}" height="${S}" viewBox="0 0 ${S} ${S}">`;
+  const pos=[];for(let i=0;i<C.n;i++)pos.push([cx+R*Math.cos(ang(i)),cy+R*Math.sin(ang(i))]);
+  // bonds
+  pos.forEach(([x,y],i)=>{const a=ang(i),px=-Math.sin(a),py=Math.cos(a);for(let k=0;k<m[i];k++){const off=(k-(m[i]-1)/2)*10;
+    s+=`<line x1="${cx+px*off}" y1="${cy+py*off}" x2="${x+px*off}" y2="${y+py*off}" stroke="#16324A" stroke-width="4" stroke-linecap="round"/>`;}});
+  // central free hands
+  const stub=(x0,y0,a,r)=>`<line x1="${x0+r*Math.cos(a)}" y1="${y0+r*Math.sin(a)}" x2="${x0+(r+24)*Math.cos(a)}" y2="${y0+(r+24)*Math.sin(a)}" stroke="#c0392b" stroke-width="5" stroke-linecap="round"/>`;
+  for(let j=0;j<rem;j++){const a=C.n===0?(-90+j*360/v)*Math.PI/180:ang(0)+(Math.PI*2/Math.max(C.n,1))*((j%Math.max(C.n,1))+0.5)+(Math.floor(j/Math.max(C.n,1)))*0.35;s+=stub(cx,cy,a,ra);}
+  // outer atoms
+  pos.forEach(([x,y],i)=>{const free=w-m[i],a=ang(i);for(let j=0;j<free;j++){s+=stub(x,y,a+(j-(free-1)/2)*0.6,rb);}});
+  const atom=(x,y,r,el)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${COL[el]}" stroke="#16324A" stroke-width="2"/><text x="${x}" y="${y+8}" text-anchor="middle" font-size="${r*0.75}" font-weight="bold" font-family="Calibri,Arial" fill="${DARK.has(el)?'#fff':'#16324A'}">${el}</text>`;
+  s+=atom(cx,cy,ra,C.a);pos.forEach(([x,y])=>s+=atom(x,y,rb,C.b));
+  $('c_svg').innerHTML=s+'</svg>';
+  // chips
+  const tgt=el=>el==='H'?2:8;
+  let ch=`<span class="chip ${NM[C.a][1]+(v-rem)===tgt(C.a)?'ok':'bad'}">${C.a} (middle): ${NM[C.a][1]} own + ${v-rem} shared in = ${NM[C.a][1]+(v-rem)} / ${tgt(C.a)}</span>`;
+  m.forEach((k,i)=>{ch+=`<span class="chip ${NM[C.b][1]+k===tgt(C.b)?'ok':'bad'}">${C.b}${C.n>1?' #'+(i+1):''}: ${NM[C.b][1]} + ${k} = ${NM[C.b][1]+k} / ${tgt(C.b)}</span>`;});
+  $('c_chips').innerHTML=ch;
+  const over=m.some(k=>k<w),pre=swapped?'(The atom with more hands goes in the middle, so I swapped them.) ':'';
+  const nmax=v/w;
+  if(C.n===0)setMsg('c_msg','info',pre+`${C.a} has <b>${v}</b> bonding hand${v>1?'s':''}. Each ${C.b} has <b>${w}</b>. Add ${C.b} atoms until every hand is used.`);
+  else if(over)setMsg('c_msg','bad',pre+`Too many! ${C.a} has no hands left, so the last ${C.b} still has an empty hand. Remove it.`);
+  else if(rem>0)setMsg('c_msg','warn',pre+`${C.a} still has <b>${rem}</b> empty hand${rem>1?'s':''}. Add another ${C.b}.`);
+  else{const f=cFormula(C.a,C.b,C.n);
+    $('c_ratio').classList.remove('hide');
+    $('c_ratio').innerHTML=C.a===C.b?`<div class="rl">Atoms in one molecule</div><div class="rv">${F(f)}&nbsp;=&nbsp;2 ${C.a} atoms</div><div class="rs">${C.a} atoms pair up: ${v} shared pair${v>1?'s':''} between them</div>`
+      :`<div class="rl">Ratio of atoms in ${F(f)}</div><div class="rv"><span class="who">${C.a} : ${C.b}</span>&nbsp;&nbsp;1 : ${nmax}</div><div class="rs">For every <b>1</b> ${C.a} atom there ${nmax>1?'are':'is'} <b>${nmax}</b> ${C.b} atom${nmax>1?'s':''}</div>`;
+    setMsg('c_msg','ok',pre+`<span class="big">${F(f)}</span> ${CNAME[f]?'— '+CNAME[f]:''}<br>Every atom now has a full outer shell.<br><b>Why this ratio?</b> ${C.a===C.b?`Each ${C.a} atom makes ${v} bond${v>1?'s':''}, so two ${C.a} atoms hold all their hands together${v>1?' with a '+(v===2?'double':'triple')+' bond':''}. Elements like this exist as molecules of 2 atoms.`:`${C.a} makes ${v} bond${v>1?'s':''}; each ${C.b} makes ${w}. So ${C.a} needs ${v} ÷ ${w} = <b>${nmax}</b> ${C.b} atom${nmax>1?'s':''}${w>1?`, each joined by a ${w===2?'double':'triple'} bond`:''}. Ratio ${C.a} : ${C.b} = 1 : ${nmax}.`}`);}
+}
+
+/* ================= FORMULA TOOLS ================= */
+function parseF(f){let i=0;const num=()=>{const m=f.slice(i).match(/^\d+/);if(m){i+=m[0].length;return +m[0];}return 1;};
+  const grp=()=>{const c={};while(i<f.length&&f[i]!==')'){if(f[i]==='('){i++;const g=grp();i++;const k=num();for(const e in g)c[e]=(c[e]||0)+g[e]*k;}else{const m=f.slice(i).match(/^[A-Z][a-z]?/);i+=m[0].length;const k=num();c[m[0]]=(c[m[0]]||0)+k;}}return c;};
+  return grp();}
+function tallyC(Lc,Rc,cl,cr){const order=[],l={},r={};
+  const addAll=(arr,co,obj)=>arr.forEach((p,i)=>{for(const e in p){if(!order.includes(e))order.push(e);obj[e]=(obj[e]||0)+p[e]*co[i];}});
+  addAll(Lc,cl,l);addAll(Rc,cr,r);return order.map(e=>({e,l:l[e]||0,r:r[e]||0}));}
+function tally(L,R,cl,cr){return tallyC(L.map(parseF),R.map(parseF),cl,cr);}
+function tallyHTML(rows,lab){let h=lab?'<tr><th>Part</th><th>In what you order</th><th>In what you make</th><th></th></tr>':'<tr><th>Atom</th><th>Left (reactants)</th><th>Right (products)</th><th></th></tr>';
+  rows.forEach(x=>{const ok=x.l===x.r;h+=`<tr><td><b>${lab?lab(x.e):x.e}</b></td><td>${x.l}</td><td>${x.r}</td><td style="color:${ok?'var(--ok)':'var(--bad)'};font-weight:bold">${ok?'✓':'✗'}</td></tr>`;});return h;}
+/* realistic space-filling models: atoms {e,r,x,y,q} in arbitrary units */
+const RAD={H:.55,C:.85,N:.8,O:.8,Cl:1.0,Na:1.15,Mg:1.05,Ca:1.2,Al:1.0,Fe:.95};
+const IRAD={Na:.72,Mg:.58,Ca:.85,Al:.48,Fe:.55,Cl:1.12,O:.98};
+function geo(f){
+  const A=[];const at=(e,x,y,o={})=>{const a={e,x,y,r:o.q?IRAD[e]:RAD[e],q:o.q||0};A.push(a);return a;};
+  const near=(a,e,deg,o={})=>{const r=o.q?IRAD[e]:RAD[e],d=(a.r+r)*(o.q?0.98:0.78)*(o.k||1),t=deg*Math.PI/180;return at(e,a.x+d*Math.cos(t),a.y+d*Math.sin(t),o);};
+  switch(f){
+    case 'H2':case 'O2':case 'N2':case 'Cl2':{const e=f.replace('2','');const a=at(e,0,0);near(a,e,0);break;}
+    case 'HCl':{const a=at('H',0,0);near(a,'Cl',0);break;}
+    case 'H2O':{const o=at('O',0,0);near(o,'H',142);near(o,'H',38);break;}          // bent, 104.5°
+    case 'NH3':{const n={e:'N',x:0,y:0,r:RAD.N};near(n,'H',90,{k:.6});A.push(n);near(n,'H',150);near(n,'H',30);break;} // pyramid
+    case 'CH4':{const c={e:'C',x:0,y:0,r:RAD.C};near(c,'H',75,{k:.55});A.push(c);near(c,'H',-90);near(c,'H',200);near(c,'H',340);break;} // tetrahedral
+    case 'CO2':{const c=at('C',0,0);near(c,'O',180);near(c,'O',0);break;}           // linear
+    case 'NaCl':{const a=at('Na',0,0,{q:1});near(a,'Cl',0,{q:-1});break;}
+    case 'MgO':{const a=at('Mg',0,0,{q:2});near(a,'O',0,{q:-2});break;}
+    case 'MgCl2':case 'CaCl2':{const m=f.slice(0,2);const a=at(m,0,0,{q:2});near(a,'Cl',180,{q:-1});near(a,'Cl',0,{q:-1});break;}
+    case 'FeCl3':{const a=at('Fe',0,0,{q:3});near(a,'Cl',-90,{q:-1});near(a,'Cl',30,{q:-1});near(a,'Cl',150,{q:-1});break;}
+    case 'Al2O3':{const o1=at('O',0,0,{q:-2});const a1=near(o1,'Al',30,{q:3});const o2=near(a1,'O',-30,{q:-2});const a2=near(o2,'Al',30,{q:3});near(a2,'O',-30,{q:-2});break;}
+    case 'NaOH':{const na=at('Na',0,0,{q:1});const o=near(na,'O',0,{q:-1});o.r=.85;o.x=na.r+.85;near(o,'H',-35);o.q=-1;break;}
+    default:{const p=parseF(f),k=Object.keys(p);if(k.length===1&&p[k[0]]===1&&RAD[k[0]]){at(k[0],0,0);break;}return null;}
+  }
+  return A;
+}
+function molSVG(f){
+  let A=geo(f);if(!A)return molSVGold(f);
+  if(A.some(a=>a.q))A=[...A.filter(a=>a.q<0),...A.filter(a=>a.q>=0)]; // draw small positive ions on top
+  const U=22;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  A.forEach(a=>{x0=Math.min(x0,a.x-a.r);y0=Math.min(y0,a.y-a.r);x1=Math.max(x1,a.x+a.r);y1=Math.max(y1,a.y+a.r);});
+  const W=(x1-x0)*U+6,H=(y1-y0)*U+6;
+  let s=`<svg width="${W.toFixed(0)}" height="${H.toFixed(0)}" style="margin:2px">`;
+  A.forEach(a=>{const cx=(a.x-x0)*U+3,cy=(a.y-y0)*U+3,r=a.r*U,c=COL[a.e]||'#999';
+    s+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${c}" stroke="#16324A" stroke-width="1"/>`;
+    s+=`<ellipse cx="${cx-r*.35}" cy="${cy-r*.38}" rx="${r*.35}" ry="${r*.22}" fill="#fff" opacity=".45"/>`;
+    const lab=a.e+(a.q?chg(a.q):'');const fs=Math.max(9,Math.min(15,r*.7));
+    s+=`<text x="${cx}" y="${cy+fs*.35}" text-anchor="middle" font-size="${fs}" font-weight="bold" font-family="Calibri,Arial" fill="${DARK.has(a.e)?'#fff':'#16324A'}">${lab}</text>`;});
+  return s+'</svg>';
+}
+function molSVGold(f){const p=parseF(f),atoms=[];for(const e in p)for(let k=0;k<p[e];k++)atoms.push(e);
+  const n=atoms.length,cols=Math.min(n,n>6?Math.ceil(Math.sqrt(n*1.6)):n),rows=Math.ceil(n/cols),d=17,r=10;
+  const W=cols*d+8,H=rows*d+8;let s=`<svg width="${W}" height="${H}">`;
+  atoms.forEach((e,i)=>{const x=6+r+(i%cols)*d-2,y=6+r+Math.floor(i/cols)*d-2;s+=`<circle cx="${x}" cy="${y}" r="${r}" fill="${COL[e]||'#999'}" stroke="#16324A" stroke-width="1"/><text x="${x}" y="${y+4}" text-anchor="middle" font-size="${e.length>1?9:11}" font-family="Calibri,Arial" font-weight="bold" fill="${DARK.has(e)?'#fff':'#16324A'}">${e}</text>`;});
+  return s+'</svg>';}
+function eqHTML(L,R,cl,cr,stL,stR){const side=(a,co,st)=>a.map((f,i)=>`${co[i]>1?'<b style="color:var(--teal)">'+co[i]+'</b>':''}${F(f)}${st?'<span class="state">('+st[i]+')</span>':''}`).join(' + ');
+  return side(L,cl,stL)+' → '+side(R,cr,stR);}
+
+/* ================= TAB 6: BALANCING LAB ================= */
+const LAB=[
+ {t:'hydrogen + oxygen → water',L:[['H2',['H','H2'],'Hydrogen is diatomic: it exists as H₂ molecules.'],['O2',['O','O2'],'Oxygen is diatomic: it exists as O₂ molecules.']],R:[['H2O',['HO','H2O','HO2'],'H has valency 1, O has valency 2. O needs 2 H atoms → H₂O.']]},
+ {t:'magnesium + oxygen → magnesium oxide',L:[['Mg'],['O2',['O','O2'],'Oxygen is diatomic: O₂.']],R:[['MgO',['Mg2O','MgO','MgO2'],'Mg²⁺ and O²⁻: charges +2 and −2 cancel 1 : 1 → MgO.']]},
+ {t:'sodium + chlorine → sodium chloride',L:[['Na'],['Cl2',['Cl','Cl2'],'Chlorine is diatomic: Cl₂.']],R:[['NaCl',['NaCl2','NaCl','Na2Cl'],'Na⁺ and Cl⁻: +1 and −1 cancel 1 : 1 → NaCl.']]},
+ {t:'calcium + chlorine → calcium chloride',L:[['Ca'],['Cl2',['Cl','Cl2'],'Chlorine is diatomic: Cl₂.']],R:[['CaCl2',['CaCl','CaCl2','Ca2Cl'],'Ca²⁺ needs two Cl⁻ to cancel its +2 charge → CaCl₂.']]},
+ {t:'aluminium + oxygen → aluminium oxide',L:[['Al'],['O2',['O','O2'],'Oxygen is diatomic: O₂.']],R:[['Al2O3',['AlO','Al3O2','Al2O3'],'Al³⁺ and O²⁻: 2 × (+3) = +6 and 3 × (−2) = −6 → Al₂O₃.']]},
+ {t:'nitrogen + hydrogen → ammonia',L:[['N2',['N','N2'],'Nitrogen is diatomic: N₂.'],['H2',['H','H2'],'Hydrogen is diatomic: H₂.']],R:[['NH3',['NH','N3H','NH3'],'N has valency 3, H has valency 1. N needs 3 H atoms → NH₃.']]},
+ {t:'methane + oxygen → carbon dioxide + water',L:[['CH4',['CH2','CH4'],'C has valency 4: it bonds to 4 H atoms → CH₄.'],['O2']],R:[['CO2',['CO2','C2O'],'C has valency 4, O has valency 2: C needs 2 O atoms (double bonds) → CO₂.'],['H2O']]},
+ {t:'iron + chlorine → iron(III) chloride',L:[['Fe'],['Cl2']],R:[['FeCl3',['FeCl','Fe3Cl','FeCl3'],'Iron(III) means Fe³⁺. It needs three Cl⁻ ions → FeCl₃.']]},
+ {t:'sodium + water → sodium hydroxide + hydrogen',L:[['Na'],['H2O']],R:[['NaOH',['NaOH','Na(OH)2'],'Na⁺ and OH⁻: +1 and −1 cancel 1 : 1 → NaOH.'],['H2']]},
+ {t:'magnesium + hydrochloric acid → magnesium chloride + hydrogen',L:[['Mg'],['HCl']],R:[['MgCl2',['MgCl','MgCl2'],'Mg²⁺ needs two Cl⁻ → MgCl₂.'],['H2']]}
+];
+const COMP={bread:['🍞','slice of bread'],cheese:['🧀','slice of cheese'],ribbon:['🎀','ribbon'],flower:['🌷','flower'],toy:['🧸','teddy bear'],tag:['🏷️','gift tag'],
+  flour:['🌾','bag of flour'],egg:['🥚','egg'],box:['📦','display box'],book:['📘','book'],laptop:['💻','laptop'],mouse:['🖱️','mouse'],battery:['🔋','battery']};
+const EVERY=[
+ {t:'Café: making cheese sandwiches',ctx:'Bread arrives in <b>bags of 2 slices</b>. Cheese arrives in <b>packs of 2 slices</b>. Each sandwich uses <b>2 slices of bread and 1 slice of cheese</b>. Find the smallest order where nothing is left over.',
+  L:[['bag of bread',{bread:2}],['pack of cheese',{cheese:2}]],R:[['cheese sandwich',{bread:2,cheese:1}]],same:[['H2','O2'],['H2O'],'bread = H, cheese = O']},
+ {t:'Florist: making bouquets',ctx:'Ribbons come on a <b>card of 2</b>. Tulips come in <b>bunches of 2</b>. Each bouquet needs <b>1 ribbon and 3 tulips</b>. Find the smallest order where nothing is left over.',
+  L:[['card of ribbons',{ribbon:2}],['bunch of tulips',{flower:2}]],R:[['bouquet',{ribbon:1,flower:3}]],same:[['N2','H2'],['NH3'],'ribbon = N, tulip = H']},
+ {t:'Gift shop: wrapping presents',ctx:'Teddy bears arrive <b>one at a time</b>. Gift tags come on <b>sheets of 2</b>. Each present is <b>1 teddy + 1 tag</b>. Find the smallest order where nothing is left over.',
+  L:[['teddy bear',{toy:1}],['sheet of tags',{tag:2}]],R:[['wrapped present',{toy:1,tag:1}]],same:[['Na','Cl2'],['NaCl'],'teddy = Na, tag = Cl']},
+ {t:'Bakery recipe: cakes',ctx:'Flour comes in <b>single bags</b>. Eggs come in <b>boxes of 2</b>. The cake recipe uses <b>2 bags of flour and 3 eggs</b>. Find the smallest order where nothing is left over.',
+  L:[['bag of flour',{flour:1}],['box of eggs',{egg:2}]],R:[['cake',{flour:2,egg:3}]],same:[['Al','O2'],['Al2O3'],'flour = Al, egg = O']},
+ {t:'Warehouse: boxed book sets',ctx:'Display boxes arrive <b>one at a time</b>. Books arrive in <b>bundles of 2</b>. Each boxed set is <b>1 box + 3 books</b>. Find the smallest order where nothing is left over.',
+  L:[['display box',{box:1}],['bundle of books',{book:2}]],R:[['boxed book set',{box:1,book:3}]],same:[['Fe','Cl2'],['FeCl3'],'box = Fe, book = Cl']},
+ {t:'Warehouse: repacking a delivery',ctx:'A delivery pallet holds <b>1 laptop and 4 mice</b>. Batteries come in <b>packs of 2</b>. The pallets are unpacked and everything is repacked into <b>laptop kits (1 laptop + 2 batteries)</b> and <b>mouse kits (2 mice + 1 battery)</b>. Nothing may be left over.',
+  L:[['delivery pallet',{laptop:1,mouse:4}],['pack of batteries',{battery:2}]],R:[['laptop kit',{laptop:1,battery:2}],['mouse kit',{mouse:2,battery:1}]],same:[['CH4','O2'],['CO2','H2O'],'laptop = C, mouse = H, battery = O']}
+];
+const Lb={mode:'every',i:0,pick:{},cl:[],cr:[]};
+$('l_me').onclick=()=>lMode('every');$('l_mc').onclick=()=>lMode('chem');
+$('l_sel').onchange=()=>lSet(+$('l_sel').value);
+$('l_reset').onclick=()=>lSet(Lb.i);
+function lMode(m){Lb.mode=m;$('l_me').classList.toggle('on',m==='every');$('l_mc').classList.toggle('on',m==='chem');
+  const list=m==='chem'?LAB:EVERY;$('l_sel').innerHTML='';list.forEach((x,i)=>{const o=document.createElement('option');o.value=i;o.textContent=(i+1)+'. '+x.t;$('l_sel').appendChild(o);});
+  $('l_idea').innerHTML=m==='chem'
+   ?'<b>Balanced equations:</b> atoms are not created or destroyed, so every atom on the left must appear on the right. First write the correct formulae (using valency), then change only the <b>big numbers in front</b>. Changing the small numbers would make a different substance.'
+   :'<b>Same maths, everyday things.</b> Parts come packed in fixed amounts, and every product needs a fixed recipe. You cannot open a pack and use half, and you cannot change the recipe. You can only change <b>how many packs and how many products</b> — exactly like the big numbers in a chemical equation.';
+  $('l_th').textContent=m==='chem'?'Atom count':'Parts count';
+  $('l_note').innerHTML=m==='chem'?'Models show real shapes and relative sizes: water is bent (H–O–H), ammonia is a pyramid, methane is a tetrahedron, carbon dioxide is straight. Ionic compounds are shown as one formula unit of ions; in reality the ions form a giant lattice. Positive ions are smaller than their atoms, and negative ions are larger.':'';$('l_hl').textContent=m==='chem'?'Reactants':'What you order';$('l_hr').textContent=m==='chem'?'Products':'What you make';
+  lSet(0);}
+function lItem(){return (Lb.mode==='chem'?LAB:EVERY)[Lb.i];}
+function lComp(sp){return Lb.mode==='chem'?parseF(sp[0]):sp[1];}
+function lSet(i){Lb.i=i;$('l_sel').value=i;Lb.pick={};const x=lItem();Lb.cl=x.L.map(()=>1);Lb.cr=x.R.map(()=>1);setMsg('l_fmsg');lRender();}
+function lReady(){if(Lb.mode!=='chem')return true;const x=lItem();return [...x.L.map((s,k)=>['L',k,s]),...x.R.map((s,k)=>['R',k,s])].every(([sd,k,s])=>!s[1]||Lb.pick[sd+k]===s[0]);}
+function pkgHTML(c){let h='';for(const k in c)h+=COMP[k][0].repeat(c[k]);return `<span class="pkg">${h}</span>`;}
+const plural=(n,w)=>{if(n===1)return w;const k=w.indexOf(' of ');if(k>0)return plural1(w.slice(0,k))+w.slice(k);return plural1(w);};
+const plural1=w=>w.endsWith('y')&&!/[aeiou]y$/.test(w)?w.slice(0,-1)+'ies':(/(s|x|ch|sh)$/.test(w)?w+'es':w+'s');
+function lRender(){
+  const x=lItem(),ready=lReady(),chem=Lb.mode==='chem';
+  $('l_words').textContent=x.t;$('l_ctx').innerHTML=chem?'':x.ctx;
+  $('l_stage').innerHTML=chem?(ready?'<b>Step 2:</b> Balance it. Use the arrows to change the big numbers until every atom count matches.':'<b>Step 1:</b> Choose the correct formula for each substance. Use valency, and remember which elements are diatomic.')
+    :'Use the arrows to change <b>how many</b> of each. The amount inside each pack and each recipe is fixed.';
+  const E=$('l_eq');E.innerHTML='';
+  const addSp=(sd,k,s)=>{const d=document.createElement('div');d.className='sp';
+    const co=sd==='L'?Lb.cl:Lb.cr;
+    const st=document.createElement('div');st.className='step';
+    const mi=document.createElement('button');mi.textContent='−';mi.disabled=!ready||co[k]<=1;mi.onclick=()=>{co[k]--;lRender();};
+    const pl=document.createElement('button');pl.textContent='+';pl.disabled=!ready||co[k]>=12;pl.onclick=()=>{co[k]++;lRender();};
+    const cv=document.createElement('span');cv.className='coef';cv.textContent=co[k];
+    st.append(mi,cv,pl);d.appendChild(st);
+    const fd=document.createElement('div');
+    if(!chem){fd.innerHTML=pkgHTML(s[1])+`<div class="pname">${s[0]}</div>`;fd.style.textAlign='center';}
+    else if(s[1]){const sel=document.createElement('select');sel.style.fontSize='22px';sel.innerHTML='<option value="">?</option>'+s[1].map(o=>`<option value="${o}">${o.replace(/(\d)/g,m=>'₀₁₂₃₄₅₆₇₈₉'[m])}</option>`).join('');
+      sel.value=Lb.pick[sd+k]||'';
+      sel.onchange=()=>{Lb.pick[sd+k]=sel.value;if(sel.value&&sel.value!==s[0])setMsg('l_fmsg','bad',`${sel.value.replace(/(\d)/g,m=>'₀₁₂₃₄₅₆₇₈₉'[m])} is not right. Hint: ${s[2]}`);else if(sel.value===s[0])setMsg('l_fmsg','ok','Correct: '+s[2]);lRender();};
+      if(Lb.pick[sd+k]===s[0])sel.style.borderColor='var(--ok)';else if(Lb.pick[sd+k])sel.style.borderColor='var(--bad)';
+      fd.appendChild(sel);} else fd.innerHTML=F(s[0]);
+    d.appendChild(fd);E.appendChild(d);};
+  const op=t=>{const o=document.createElement('div');o.className='op';o.textContent=t;o.style.alignSelf='center';E.appendChild(o);};
+  x.L.forEach((s,k)=>{if(k)op('+');addSp('L',k,s);});op('→');x.R.forEach((s,k)=>{if(k)op('+');addSp('R',k,s);});
+  $('l_ratio').classList.add('hide');
+  if(!ready){$('l_tally').innerHTML='<tr><td class="muted">Choose the formulae first.</td></tr>';$('l_pl').innerHTML='';$('l_pr').innerHTML='';setMsg('l_msg');return;}
+  const Lc=x.L.map(lComp),Rc=x.R.map(lComp);
+  const rows=tallyC(Lc,Rc,Lb.cl,Lb.cr);
+  $('l_tally').innerHTML=tallyHTML(rows,chem?null:e=>`${COMP[e][0]} ${COMP[e][1]}`);
+  const draw=(cs,co)=>cs.map((c,i)=>Array(co[i]).fill(chem?molSVG(x[cs===Lc?'L':'R'][i][0]):pkgHTML(c)).join('')).join('<span style="font-size:22px;color:#16324A;padding:0 4px">+</span>');
+  $('l_pl').innerHTML=draw(Lc,Lb.cl);$('l_pr').innerHTML=draw(Rc,Lb.cr);
+  const bal=rows.every(r=>r.l===r.r),all=[...Lb.cl,...Lb.cr],g=gcdA(all);
+  if(bal&&g===1){
+    const names=[...x.L,...x.R].map(s=>chem?F(s[0]):s[0]);
+    $('l_ratio').classList.remove('hide');
+    $('l_ratio').innerHTML=`<div class="rl">${chem?'Ratio of particles':'Ratio to order and make'}</div><div class="rv">${all.join(' : ')}</div><div class="rs">${names.map((n,i)=>`<b>${all[i]}</b> ${chem?n:plural(all[i],n)}`).slice(0,x.L.length).join(' + ')} → ${names.map((n,i)=>`<b>${all[i]}</b> ${chem?n:plural(all[i],n)}`).slice(x.L.length).join(' + ')}</div>`;
+    if(chem)setMsg('l_msg','ok',`Balanced! <span style="font-size:22px">${eqHTML(x.L.map(s=>s[0]),x.R.map(s=>s[0]),Lb.cl,Lb.cr)}</span>`);
+    else{const [sl,sr,key]=x.same;setMsg('l_msg','ok',`Nothing left over! <br><b>Same maths in chemistry</b> (${key}):<br><span style="font-size:24px">${eqHTML(sl,sr,Lb.cl,Lb.cr)}</span>`);}
+  }
+  else if(bal)setMsg('l_msg','warn',`${chem?'Balanced':'Nothing left over'}, but not with the smallest whole numbers. Divide every number by ${g}.`);
+  else{const bad=rows.filter(r=>r.l!==r.r).map(r=>chem?r.e:COMP[r.e][1]+'s');setMsg('l_msg','info',`${chem?'Not balanced yet':'Not matching yet'}: check ${bad.join(', ')}. Tip: start with something that appears in only one item on each side.`);}
+}
+
+/* ================= TAB 7: QUIZ ================= */
+const QZ=[
+ {lv:1,t:'Metals with oxygen',L:[['Zn','s'],['O2','g']],R:[['ZnO','s']],c:[2,1,2],st:['O: 2 on the left (O₂), 1 on the right (ZnO). Put 2 in front of ZnO.','Zn: now 1 on the left, 2 on the right. Put 2 in front of Zn.']},
+ {lv:1,t:'Metals with chlorine',L:[['Fe','s'],['Cl2','g']],R:[['FeCl3','s']],c:[2,3,2],st:['Cl: 2 on the left, 3 on the right. Cl comes in 2s on the left and 3s on the right.','The smallest number both 2 and 3 go into is 6. So 3Cl₂ (6 Cl) and 2FeCl₃ (6 Cl).','Fe: now 2 on the right, so put 2 in front of Fe.']},
+ {lv:1,t:'Metals with oxygen',L:[['Li','s'],['O2','g']],R:[['Li2O','s']],c:[4,1,2],st:['O: 2 on the left, 1 on the right. Put 2 in front of Li₂O.','Li: 2Li₂O contains 2 × 2 = 4 Li. Put 4 in front of Li.']},
+ {lv:1,t:'Burning hydrogen',L:[['H2','g'],['O2','g']],R:[['H2O','g']],c:[2,1,2],st:['O: 2 on the left, 1 on the right. Put 2 in front of H₂O.','H: now 2 × 2 = 4 on the right, but only 2 on the left. Put 2 in front of H₂.']},
+ {lv:1,t:'Magnesium burning in carbon dioxide',L:[['Mg','s'],['CO2','g']],R:[['MgO','s'],['C','s']],c:[2,1,2,1],st:['C: 1 on each side ✓.','O: 2 on the left (CO₂), 1 on the right (MgO). Put 2 in front of MgO.','Mg: now 2 on the right. Put 2 in front of Mg.']},
+ {lv:1,t:'Worked example: magnesium + oxygen',L:[['Mg','s'],['O2','g']],R:[['MgO','s']],c:[2,1,2],st:['O: 2 on the left (O₂ is diatomic), 1 on the right. We cannot change MgO, so put 2 in front: 2MgO.','Mg: now 2 on the right and 1 on the left. Put 2 in front of Mg.']},
+ {lv:1,t:'Sodium with chlorine',L:[['Na','s'],['Cl2','g']],R:[['NaCl','s']],c:[2,1,2],st:['Cl: 2 on the left, 1 on the right. Put 2 in front of NaCl.','Na: now 2 on the right. Put 2 in front of Na.']},
+ {lv:1,t:'Calcium with oxygen',L:[['Ca','s'],['O2','g']],R:[['CaO','s']],c:[2,1,2],st:['O: 2 on the left, 1 on the right. Put 2 in front of CaO.','Ca: now 2 on the right. Put 2 in front of Ca.']},
+ {lv:1,t:'Copper with oxygen',L:[['Cu','s'],['O2','g']],R:[['CuO','s']],c:[2,1,2],st:['O: 2 on the left, 1 on the right. Put 2 in front of CuO.','Cu: now 2 on the right. Put 2 in front of Cu.']},
+ {lv:1,t:'Hydrogen with chlorine',L:[['H2','g'],['Cl2','g']],R:[['HCl','g']],c:[1,1,2],st:['H: 2 on the left, 1 on the right. Put 2 in front of HCl.','Cl: 2 on the left, 2 on the right ✓. Nothing else needs changing.']},
+ {lv:1,t:'Thermal decomposition',L:[['CaCO3','s']],R:[['CaO','s'],['CO2','g']],c:[1,1,1],st:['Ca: 1 = 1 ✓. C: 1 = 1 ✓.','O: 3 on the left; 1 + 2 = 3 on the right ✓.','It is already balanced — every big number is 1.']},
+ {lv:2,t:'Metal + acid',L:[['Mg','s'],['HCl','aq']],R:[['MgCl2','aq'],['H2','g']],c:[1,2,1,1],st:['Mg: 1 = 1 ✓.','Cl: 1 on the left, 2 on the right. Put 2 in front of HCl.','H: now 2 on the left, 2 on the right (H₂) ✓.']},
+ {lv:2,t:'Group I metal + water',L:[['Na','s'],['H2O','l']],R:[['NaOH','aq'],['H2','g']],c:[2,2,2,1],st:['H: 2 on the left; 1 + 2 = 3 on the right — an odd number, which can never match the 2s on the left.','Put 2 in front of NaOH: H on the right = 2 + 2 = 4. So put 2 in front of H₂O (4 H).','O: 2 = 2 ✓. Na: 2 on the right, so put 2 in front of Na.']},
+ {lv:2,t:'Group I metal + water',L:[['K','s'],['H2O','l']],R:[['KOH','aq'],['H2','g']],c:[2,2,2,1],st:['H: 2 on the left; 1 + 2 = 3 on the right — odd.','Put 2 in front of KOH: H on the right = 4. Put 2 in front of H₂O.','O: 2 = 2 ✓. K: put 2 in front of K.']},
+ {lv:2,t:'Calcium + water',L:[['Ca','s'],['H2O','l']],R:[['Ca(OH)2','aq'],['H2','g']],c:[1,2,1,1],st:['Ca: 1 = 1 ✓.','O: 1 on the left, 2 on the right (inside (OH)₂). Put 2 in front of H₂O.','H: left = 2 × 2 = 4; right = 2 + 2 = 4 ✓.']},
+ {lv:2,t:'Burning methane',L:[['CH4','g'],['O2','g']],R:[['CO2','g'],['H2O','l']],c:[1,2,1,2],st:['C: 1 = 1 ✓.','H: 4 on the left, 2 on the right. Put 2 in front of H₂O.','O: right = 2 (CO₂) + 2 (2H₂O) = 4. Put 2 in front of O₂.']},
+ {lv:2,t:'The Haber process',L:[['N2','g'],['H2','g']],R:[['NH3','g']],c:[1,3,2],st:['N: 2 on the left, 1 on the right. Put 2 in front of NH₃.','H: now 2 × 3 = 6 on the right. Put 3 in front of H₂ (6 H).']},
+ {lv:2,t:'Marble chips + acid',L:[['CaCO3','s'],['HCl','aq']],R:[['CaCl2','aq'],['CO2','g'],['H2O','l']],c:[1,2,1,1,1],st:['Ca: 1 = 1 ✓. C: 1 = 1 ✓.','Cl: 1 on the left, 2 on the right. Put 2 in front of HCl.','H: 2 = 2 ✓. O: 3 on the left; 2 + 1 = 3 on the right ✓.']},
+ {lv:2,t:'Halogen displacement',L:[['KI','aq'],['Cl2','g']],R:[['KCl','aq'],['I2','aq']],c:[2,1,2,1],st:['I: 1 on the left, 2 on the right. Put 2 in front of KI.','K: now 2 on the left. Put 2 in front of KCl.','Cl: 2 = 2 ✓.']},
+ {lv:2,t:'Decomposing hydrogen peroxide',L:[['H2O2','aq']],R:[['H2O','l'],['O2','g']],c:[2,2,1],st:['O: 2 on the left; 1 + 2 = 3 on the right — odd.','Try 2H₂O₂: left now has 4 H and 4 O.','2H₂O gives 4 H and 2 O; add O₂ (2 O) → 4 O on the right ✓.']},
+ {lv:2,t:'Heating sodium hydrogencarbonate',L:[['NaHCO3','s']],R:[['Na2CO3','s'],['H2O','g'],['CO2','g']],c:[2,1,1,1],st:['Na: 1 on the left, 2 on the right. Put 2 in front of NaHCO₃.','Left now: 2 Na, 2 H, 2 C, 6 O.','Right: Na 2, H 2, C 1 + 1 = 2, O 3 + 1 + 2 = 6 ✓.']},
+ {lv:2,t:'Lithium oxide + water',L:[['Li2O','s'],['H2O','l']],R:[['LiOH','aq']],c:[1,1,2],st:['Li: 2 on the left, 1 on the right. Put 2 in front of LiOH.','O: 1 + 1 = 2 on the left, 2 on the right ✓. H: 2 = 2 ✓.']},
+ {lv:2,t:'Nitrogen + oxygen in a car engine',L:[['N2','g'],['O2','g']],R:[['NO','g']],c:[1,1,2],st:['N: 2 on the left, 1 on the right. Put 2 in front of NO.','O: 2 = 2 ✓.']},
+ {lv:3,t:'Blast furnace',L:[['Fe2O3','s'],['CO','g']],R:[['Fe','l'],['CO2','g']],c:[1,3,2,3],st:['Fe: 2 on the left. Put 2 in front of Fe.','Each CO picks up one O atom to become CO₂, so CO and CO₂ always have the same big number.','Fe₂O₃ gives up 3 O atoms → needs 3CO, making 3CO₂.','Check O: left 3 + 3 = 6; right 3 × 2 = 6 ✓.']},
+ {lv:3,t:'Burning propane',L:[['C3H8','g'],['O2','g']],R:[['CO2','g'],['H2O','l']],c:[1,5,3,4],st:['Tip for burning fuels: balance C first, then H, then O last.','C: 3 on the left → 3CO₂.','H: 8 on the left → 4H₂O.','O: right = 3 × 2 + 4 × 1 = 10. Put 5 in front of O₂ (10 O).']},
+ {lv:3,t:'Test for iron(III) ions',L:[['FeCl3','aq'],['NaOH','aq']],R:[['Fe(OH)3','s'],['NaCl','aq']],c:[1,3,1,3],st:['Treat OH as one unit. Fe: 1 = 1 ✓.','OH: 3 on the right in Fe(OH)₃. Put 3 in front of NaOH.','Na: now 3 on the left. Put 3 in front of NaCl. Cl: 3 = 3 ✓.']},
+ {lv:3,t:'Electrolysis of aluminium oxide',L:[['Al2O3','l']],R:[['Al','l'],['O2','g']],c:[2,4,3],st:['O: 3 on the left, 2 on the right. The smallest number both go into is 6.','So 2Al₂O₃ (6 O) and 3O₂ (6 O).','Al: 2 × 2 = 4 on the left. Put 4 in front of Al.']},
+ {lv:3,t:'Burning ethanol',L:[['CH3CH2OH','l'],['O2','g']],R:[['CO2','g'],['H2O','g']],c:[1,3,2,3],st:['C: 2 on the left → 2CO₂.','H: 3 + 2 + 1 = 6 on the left → 3H₂O.','O: right = 2 × 2 + 3 = 7. Ethanol already has 1 O, so O₂ must give 6 → 3O₂.']},
+ {lv:3,t:'Incomplete combustion of methane',L:[['CH4','g'],['O2','g']],R:[['CO','g'],['H2O','l']],c:[2,3,2,4],st:['C: 1 = 1. H: 4 on the left → 2H₂O.','O: right = 1 + 2 = 3 — odd, but O₂ only comes in 2s.','Double everything: 2CH₄ → 2CO + 4H₂O. O on the right = 2 + 4 = 6 → 3O₂.']},
+ {lv:3,t:'Respiration',L:[['C6H12O6','aq'],['O2','g']],R:[['CO2','g'],['H2O','l']],c:[1,6,6,6],st:['C: 6 on the left → 6CO₂.','H: 12 on the left → 6H₂O.','O: right = 12 + 6 = 18. Glucose already has 6 O, so O₂ must give 12 → 6O₂.']},
+ {lv:3,t:'Carbonate + nitric acid',L:[['CuCO3','s'],['HNO3','aq']],R:[['Cu(NO3)2','aq'],['CO2','g'],['H2O','l']],c:[1,2,1,1,1],st:['Treat NO₃ as one unit. Cu: 1 = 1 ✓.','NO₃: 1 on the left, 2 on the right. Put 2 in front of HNO₃.','H: 2 = 2 ✓. C: 1 = 1 ✓. O: left 3 + 6 = 9; right 6 + 2 + 1 = 9 ✓.']},
+ {lv:3,t:'Sodium thiosulfate + acid',L:[['Na2S2O3','aq'],['HCl','aq']],R:[['NaCl','aq'],['S','s'],['SO2','g'],['H2O','l']],c:[1,2,2,1,1,1],st:['Na: 2 on the left. Put 2 in front of NaCl.','Cl: now 2 on the right. Put 2 in front of HCl.','H: 2 = 2 ✓. S: 2 on the left; 1 + 1 = 2 on the right ✓. O: 3 = 2 + 1 ✓.']},
+ {lv:3,t:'Catalytic converter',L:[['NO','g'],['CO','g']],R:[['N2','g'],['CO2','g']],c:[2,2,1,2],st:['N: 1 on the left, 2 on the right. Put 2 in front of NO.','C: CO and CO₂ always share the same big number.','Try 2CO and 2CO₂: O on the left = 2 + 2 = 4; on the right = 2 × 2 = 4 ✓.']},
+ {lv:3,t:'Test for sulfate ions',L:[['BaCl2','aq'],['Na2SO4','aq']],R:[['BaSO4','s'],['NaCl','aq']],c:[1,1,1,2],st:['Ba: 1 = 1 ✓. SO₄: 1 = 1 ✓.','Na: 2 on the left. Put 2 in front of NaCl.','Cl: 2 = 2 ✓.']},
+ {lv:3,t:'Cracking',L:[['C12H26','g']],R:[['C8H18','g'],['C4H8','g']],c:[1,1,1],st:['C: 12 on the left; 8 + 4 = 12 on the right ✓.','H: 26 on the left; 18 + 8 = 26 on the right ✓.','Already balanced — all big numbers are 1.']},
+ {lv:3,t:'Iron(III) oxide + carbon',L:[['Fe2O3','s'],['C','s']],R:[['Fe','l'],['CO2','g']],c:[2,3,4,3],st:['O: 3 on the left, 2 on the right. Smallest number both go into is 6 → 2Fe₂O₃ and 3CO₂.','C: 3 on the right → 3C.','Fe: 2 × 2 = 4 on the left → 4Fe.']}
+];
+const Q={lv:1,list:[],i:0,score:0,tries:0,done:false,N:10};
+document.querySelectorAll('[data-lv]').forEach(b=>b.onclick=()=>qStart(+b.dataset.lv));
+function qStart(lv){Q.lv=lv;document.querySelectorAll('[data-lv]').forEach(b=>b.classList.toggle('sel',+b.dataset.lv===lv));
+  const pool=QZ.filter(q=>lv===0||q.lv===lv);Q.list=shuffle(pool).slice(0,Math.min(Q.N,pool.length));Q.i=0;Q.score=0;qShow();}
+function qShow(){
+  const A=$('q_area');
+  if(Q.i>=Q.list.length){A.innerHTML=`<div class="big">Finished: ${Q.score} / ${Q.list.length}</div><p>A point is scored when an equation is correct without using "Show working".</p><button class="btn" onclick="qStart(Q.lv)">Try another set</button>`;$('q_score').textContent=`${Q.score}/${Q.list.length}`;return;}
+  const q=Q.list[Q.i];Q.tries=0;Q.done=false;Q.shown=false;
+  $('q_score').textContent=`Q ${Q.i+1}/${Q.list.length} · Score ${Q.score}`;
+  const n=q.L.length+q.R.length;let k=0;
+  const side=a=>a.map(([f,s])=>`<span><input class="qin" type="number" min="1" max="20" id="qi${k++}">${F(f)}<span class="state">(${s})</span></span>`).join('<span class="op">+</span>');
+  A.innerHTML=`<h3>${q.t}</h3><div class="eq" style="align-items:center">${side(q.L)}<span class="op">→</span>${side(q.R)}</div>
+   <button class="btn" id="q_chk">Check</button><button class="btn ghost" id="q_hint">Hint: count the atoms</button><button class="btn alt" id="q_sol">Show working</button><button class="btn gold hide" id="q_next">Next →</button>
+   <div id="q_msg" class="msg"></div><div id="q_hbox"></div><div id="q_sbox"></div>`;
+  for(let j=0;j<n;j++)$('qi'+j).addEventListener('keydown',e=>{if(e.key==='Enter')qCheck();});
+  $('q_chk').onclick=qCheck;$('q_hint').onclick=qHint;$('q_sol').onclick=qSol;$('q_next').onclick=()=>{Q.i++;qShow();};
+}
+function qVals(){const q=Q.list[Q.i],n=q.L.length+q.R.length,v=[];for(let j=0;j<n;j++){const s=$('qi'+j).value.trim();v.push(s===''?1:parseInt(s));}return v;}
+function qHint(){const q=Q.list[Q.i],v=qVals();if(v.some(x=>!(x>=1))){setMsg('q_msg','warn','Use whole numbers of 1 or more.');return;}
+  const nl=q.L.length;$('q_hbox').innerHTML='<h3>Atom count with your numbers</h3><table class="t" style="max-width:520px">'+tallyHTML(tally(q.L.map(x=>x[0]),q.R.map(x=>x[0]),v.slice(0,nl),v.slice(nl)))+'</table>';}
+function qCheck(){if(Q.done)return;const q=Q.list[Q.i],v=qVals(),nl=q.L.length;
+  if(v.some(x=>!(x>=1)||x>20)){setMsg('q_msg','warn','Use whole numbers from 1 to 20 (leave a box empty for 1).');return;}
+  Q.tries++;
+  const rows=tally(q.L.map(x=>x[0]),q.R.map(x=>x[0]),v.slice(0,nl),v.slice(nl));
+  const bal=rows.every(r=>r.l===r.r),g=gcdA(v);
+  if(bal&&g===1){Q.done=true;if(!Q.shown)Q.score++;$('q_score').textContent=`Q ${Q.i+1}/${Q.list.length} · Score ${Q.score}`;
+    setMsg('q_msg','ok',`Correct! <span style="font-size:22px">${eqHTML(q.L.map(x=>x[0]),q.R.map(x=>x[0]),v.slice(0,nl),v.slice(nl),q.L.map(x=>x[1]),q.R.map(x=>x[1]))}</span>`);
+    $('q_next').classList.remove('hide');qHint();}
+  else if(bal)setMsg('q_msg','warn',`Balanced, but not the smallest whole numbers. Divide them all by ${g}.`);
+  else setMsg('q_msg','bad',`Not balanced yet${Q.tries>1?' — the unbalanced atoms are: <b>'+rows.filter(r=>r.l!==r.r).map(r=>r.e).join(', ')+'</b>':''}. Try the hint to count the atoms.`);
+}
+function qSol(){const q=Q.list[Q.i],nl=q.L.length;Q.shown=true;
+  const Lf=q.L.map(x=>x[0]),Rf=q.R.map(x=>x[0]),cl=q.c.slice(0,nl),cr=q.c.slice(nl);
+  $('q_sbox').innerHTML=`<h3>Working</h3><div class="muted">Start with every big number = 1:</div><table class="t" style="max-width:520px;margin:6px 0">${tallyHTML(tally(Lf,Rf,Lf.map(()=>1),Rf.map(()=>1)))}</table>
+   <ol class="steps">${q.st.map(s=>'<li>'+s+'</li>').join('')}</ol>
+   <div style="font-size:22px;margin:8px 0"><b>Balanced:</b> ${eqHTML(Lf,Rf,cl,cr,q.L.map(x=>x[1]),q.R.map(x=>x[1]))}</div>
+   <div class="muted">Final check:</div><table class="t" style="max-width:520px;margin-top:6px">${tallyHTML(tally(Lf,Rf,cl,cr))}</table>
+   <p class="muted">Type the numbers in and press Check to move on (no point scored for this one).</p>`;}
+
+/* ================= TAB 8: EXTRACTION CHALLENGES ================= */
+const XC=[
+ {t:'Iron from haematite',icon:'⛏️',
+  intro:'A mining company tests a <b>320 g</b> sample of haematite ore from a new site. Analysis shows it contains <b>240 g of iron(III) oxide, Fe₂O₃</b>. The rest is sand and rock. In the blast furnace, carbon monoxide removes the oxygen:',
+  eq:'Fe₂O₃(s) + 3CO(g) → 2Fe(l) + 3CO₂(g)',
+  steps:[
+   {sk:'Purity',q:'What is the percentage purity of the ore (the percentage of Fe₂O₃ by mass)?',a:75,u:'%',
+    w:['% purity = (mass of pure substance ÷ mass of sample) × 100','= (240 ÷ 320) × 100','= 0.75 × 100 = <b>75%</b>']},
+   {sk:'Relative formula mass',q:'Calculate the relative formula mass, Mᵣ, of Fe₂O₃.',a:160,u:'',
+    w:['Fe₂O₃ has 2 Fe and 3 O','Mᵣ = (2 × 56) + (3 × 16)','= 112 + 48 = <b>160</b>']},
+   {sk:'Moles from mass',q:'How many moles of Fe₂O₃ are in the 240 g?',a:1.5,u:'mol',
+    w:['n = m ÷ M','= 240 ÷ 160','= <b>1.5 mol</b>']},
+   {sk:'Reacting masses',q:'What mass of iron can be made from this Fe₂O₃?',a:168,u:'g',
+    w:['From the equation: 1 Fe₂O₃ → 2 Fe, so the ratio is 1 : 2','n(Fe) = 1.5 × 2 = 3.0 mol','m = n × M = 3.0 × 56','= <b>168 g</b> of iron']},
+   {sk:'Gas volume',q:'What volume of carbon dioxide is given off, measured at r.t.p.?',a:108,u:'dm³',
+    w:['From the equation: 1 Fe₂O₃ → 3 CO₂, so the ratio is 1 : 3','n(CO₂) = 1.5 × 3 = 4.5 mol','V = n × 24 = 4.5 × 24','= <b>108 dm³</b>']}
+  ]},
+ {t:'Aluminium from bauxite',icon:'⚡',
+  intro:'Bauxite is the ore of aluminium. A <b>510 g</b> sample of bauxite is <b>60% aluminium oxide, Al₂O₃</b>, by mass. The Al₂O₃ is purified, dissolved in molten cryolite and electrolysed:',
+  eq:'2Al₂O₃(l) → 4Al(l) + 3O₂(g)',
+  steps:[
+   {sk:'Using % purity',q:'What mass of Al₂O₃ is in the 510 g sample?',a:306,u:'g',
+    w:['60% means 60 g in every 100 g','mass of Al₂O₃ = (60 ÷ 100) × 510','= 0.60 × 510 = <b>306 g</b>']},
+   {sk:'Mᵣ and moles',q:'How many moles of Al₂O₃ is this?',a:3,u:'mol',
+    w:['Mᵣ of Al₂O₃ = (2 × 27) + (3 × 16) = 54 + 48 = 102','n = m ÷ M = 306 ÷ 102','= <b>3.00 mol</b>']},
+   {sk:'Theoretical mass',q:'What is the maximum (theoretical) mass of aluminium that could be made?',a:162,u:'g',
+    w:['From the equation: 2 Al₂O₃ → 4 Al, so the ratio is 2 : 4 = 1 : 2','n(Al) = 3.00 × 2 = 6.00 mol','m = n × M = 6.00 × 27','= <b>162 g</b>']},
+   {sk:'Percentage yield',q:'Only 121.5 g of aluminium is actually collected. What is the percentage yield?',a:75,u:'%',
+    w:['% yield = (actual mass ÷ theoretical mass) × 100','= (121.5 ÷ 162) × 100','= 0.75 × 100 = <b>75%</b>']},
+   {sk:'Number of particles',q:'The full 3.00 mol of Al₂O₃ is electrolysed. How many oxygen molecules, O₂, are formed at the anode?',a:2.709e24,u:'molecules',sci:true,
+    w:['From the equation: 2 Al₂O₃ → 3 O₂, so the ratio is 2 : 3','n(O₂) = 3.00 × 3 ÷ 2 = 4.50 mol','molecules = n × 6.02 × 10²³ = 4.50 × 6.02 × 10²³','= <b>2.71 × 10²⁴ molecules</b>']}
+  ]},
+ {t:'Quicklime from limestone',icon:'🔥',
+  intro:'Limestone is mainly calcium carbonate, CaCO₃. It is heated in a lime kiln to make quicklime (calcium oxide), which farmers use to treat acidic soil. A <b>150 g</b> sample of limestone is <b>90% CaCO₃</b> by mass.',
+  eq:'CaCO₃(s) → CaO(s) + CO₂(g)',
+  steps:[
+   {sk:'Using % purity',q:'What mass of CaCO₃ is in the 150 g sample?',a:135,u:'g',
+    w:['mass of CaCO₃ = (90 ÷ 100) × 150','= 0.90 × 150 = <b>135 g</b>']},
+   {sk:'Mᵣ and moles',q:'How many moles of CaCO₃ is this?',a:1.35,u:'mol',
+    w:['Mᵣ of CaCO₃ = 40 + 12 + (3 × 16) = 40 + 12 + 48 = 100','n = m ÷ M = 135 ÷ 100','= <b>1.35 mol</b>']},
+   {sk:'Reacting masses',q:'What mass of quicklime, CaO, is made?',a:75.6,u:'g',
+    w:['From the equation: 1 CaCO₃ → 1 CaO, so the ratio is 1 : 1','n(CaO) = 1.35 mol','Mᵣ of CaO = 40 + 16 = 56','m = n × M = 1.35 × 56 = <b>75.6 g</b>']},
+   {sk:'Gas volume',q:'What volume of carbon dioxide is released, measured at r.t.p.?',a:32.4,u:'dm³',
+    w:['From the equation: 1 CaCO₃ → 1 CO₂, so n(CO₂) = 1.35 mol','V = n × 24 = 1.35 × 24','= <b>32.4 dm³</b>']},
+   {sk:'Concentration',q:'A quality-control lab checks the same amount of CaCO₃ (1.35 mol) with hydrochloric acid:<br><b>CaCO₃ + 2HCl → CaCl₂ + CO₂ + H₂O</b><br>What volume of 2.00 mol/dm³ HCl reacts exactly with it?',a:1.35,u:'dm³',
+    w:['From the equation: 1 CaCO₃ reacts with 2 HCl, so the ratio is 1 : 2','n(HCl) = 1.35 × 2 = 2.70 mol','n = c × V, so V = n ÷ c','V = 2.70 ÷ 2.00 = <b>1.35 dm³</b>']}
+  ]}
+];
+const X={c:0,open:0,st:[]};
+function xStart(c){X.c=c;X.open=0;X.st=XC[c].steps.map(()=>({ok:false,shown:false,tries:0}));
+  document.querySelectorAll('#x_pick button').forEach((b,i)=>b.classList.toggle('sel',i===c));xRender();}
+XC.forEach((x,i)=>{const b=document.createElement('button');b.className='btn ghost';b.textContent=`${x.icon} Challenge ${i+1}: ${x.t}`;b.onclick=()=>xStart(i);$('x_pick').appendChild(b);});
+function xRender(){
+  const x=XC[X.c];
+  const score=X.st.filter(s=>s.ok&&!s.shown).length;
+  let h=`<span class="score">Steps correct: ${score} / 5</span><h2>${x.t}</h2><p>${x.intro}</p><div class="big" style="font-size:24px;margin:6px 0 10px">${x.eq.replace(/\((s|l|g|aq)\)/g,'<span class="state">($1)</span>')}</div>`;
+  x.steps.forEach((s,i)=>{
+    if(i>X.open)return;const S=X.st[i];
+    const inp=s.sci?`<input class="xin" id="xa${i}" style="width:90px" placeholder="2.5"> × 10<sup><input id="xe${i}" style="width:56px;font-size:16px" placeholder="23"></sup>`:`<input class="xin" id="xa${i}">`;
+    h+=`<div class="xstep ${S.ok?'done':''}"><h4>Step ${i+1}<span class="skill">${s.sk}</span></h4><div style="margin:4px 0 8px">${s.q}</div>
+      ${S.ok?`<b style="color:var(--ok)">✓ ${s.sci?'2.71 × 10²⁴':s.a} ${s.u}</b>`:`${inp} ${s.u} <button class="btn" onclick="xCheck(${i})">Check</button>`}
+      <button class="btn alt" onclick="xShow(${i})">Show working</button>
+      <div id="xm${i}" class="msg"></div>
+      ${S.shown?`<ol class="steps">${s.w.map(l=>'<li>'+l+'</li>').join('')}</ol>`:''}</div>`;});
+  if(X.st.every(s=>s.ok||s.shown)&&X.open>=4)h+=`<div class="msg ok">Challenge complete! You scored <b>${score} / 5</b> without the working. ${X.c<2?'Try the next challenge.':''}</div>`;
+  $('x_area').innerHTML=h;
+  x.steps.forEach((s,i)=>{const el=$('xa'+i);if(el)el.addEventListener('keydown',e=>{if(e.key==='Enter')xCheck(i);});const ee=$('xe'+i);if(ee)ee.addEventListener('keydown',e=>{if(e.key==='Enter')xCheck(i);});});
+}
+function xNum(t){t=(t||'').trim().replace(/,/g,'').replace(/×/g,'x');const m=t.match(/^(-?[\d.]+)\s*(?:[xX]\s*10\^?\s*(-?\d+)|e(-?\d+))?$/);if(!m)return NaN;return parseFloat(m[1])*Math.pow(10,+(m[2]||m[3]||0));}
+function xCheck(i){const s=XC[X.c].steps[i],S=X.st[i];
+  let v=xNum($('xa'+i).value);if(s.sci){const e=$('xe'+i).value.trim();if(e!=='')v=v*Math.pow(10,+e);}
+  if(isNaN(v)){$('xm'+i).className='msg warn';$('xm'+i).textContent='Type a number.';return;}
+  S.tries++;
+  if(Math.abs(v-s.a)<=Math.abs(s.a)*0.01){S.ok=true;if(i===X.open&&X.open<4)X.open++;xRender();return;}
+  let tip='Not quite — check your working.';
+  if(Math.abs(v*100-s.a)<=s.a*0.01)tip='Close! It looks like you forgot to multiply by 100.';
+  else if(s.sci&&Math.abs(v-s.a)>s.a*0.01&&Math.abs(Math.log10(Math.abs(v)/s.a)-Math.round(Math.log10(Math.abs(v)/s.a)))<0.005)tip='The digits look right — check the power of 10.';
+  else if(S.tries>=2)tip='Not quite. Look again at the ratio in the equation, or press “Show working”.';
+  $('xm'+i).className='msg bad';$('xm'+i).textContent=tip;}
+function xShow(i){X.st[i].shown=true;if(i===X.open&&X.open<4)X.open++;xRender();}
+
+/* ================= INIT ================= */
+showTab(1);bSet(11);mStart(1);vSet(12);iFill();iRender();$('c_a').value=C.a;$('c_b').value=C.b;cRender();lMode('every');qStart(1);xStart(0);
+</script>
+</body>
+</html>
